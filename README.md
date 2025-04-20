@@ -45,15 +45,15 @@ Various formats are supported, including share links, JSON array of outbounds an
 - [QHotkey](https://github.com/Skycoder42/QHotkey)
 
 ## FAQ
-**1**: How does this project differ from the original Nekoray?<br/>
+**How does this project differ from the original Nekoray?** <br/>
 Nekoray's developer partially abandoned the project on Decemeber of 2023, some minor updates were done recently but the project is now officially archived. This project was meant to continue the way of the original project, with lots of improvements, tons of new features and also, removal of obsolete features and simplifications.
 
-**2**: Why does my Anti-Virus detect Nekoray and/or its Core as malware?<br/>
+**Why does my Anti-Virus detect Nekoray and/or its Core as malware?** <br/>
 Nekoray's built-in update functionallity downloads the new release, removes the old files and replaces them with the new ones, which is quite simliar to what malwares do, remove your files and replace them with an encrypted version of your files.
 Also the `System DNS` feature will change your system's DNS settings, which is also considered a dangerous action by some Anti-Virus applications.
 
-**3**: Is setting the `SUID` bit really needed on Linux?<br/>
+**Is setting the `SUID` bit really needed on Linux?** <br/>
 To create and manage a system TUN interface, root access is required, without it, you will have to grant the Core some `Cap_xxx_admin` and still, need to enter your password 3 to 4 times per TUN activation. You can also opt to disable the automatic privilege escalation in `Basic Settings`->`Security`, but note that features that require root access will stop working unless you manually grant the needed permissions.
 
-**4**: Can the AUR, PKGCONFIG etc be published so that Linux users can install the app using their own ways?<br/>
+**Can the AUR, PKGCONFIG etc be published so that Linux users can install the app using their own ways?** <br/>
 The work is ongoing, soon the project will be rebranded under a new name, and then such packages will be released.
