@@ -1,0 +1,67 @@
+name: Routing Issue
+description: "Report Throne Routing Issue"
+body:
+  - type: dropdown
+    attributes:
+      label: Operating system
+      description: Operating system type
+      options:
+        - Windows
+        - Linux
+        - macOS
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: System version
+      description: Please provide the operating system version
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Installation type
+      description: Please provide the Throne installation type
+      options:
+        - zip
+        - exe
+        - deb
+        - package manager
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Version
+      description: Throne version.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Description
+      description: Please provide a detailed description of the error.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Routing profile
+      description: Get routing profile by `Routing Profile`Routing Settings - Route - <Profile name> - Export`.
+      render: shell
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Default outbound
+      description: Default outbound of the routing profile
+      options:
+        - direct
+        - proxy
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: URL List for Testing
+      description: |-
+        Format: `<URL> - <direct or proxy>`
+      render: shell
+    validations:
+      required: true
