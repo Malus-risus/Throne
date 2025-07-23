@@ -32,7 +32,6 @@ body:
     attributes:
       label: Version
       description: Throne version.
-      render: shell
     validations:
       required: true
   - type: textarea
