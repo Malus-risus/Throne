@@ -99,9 +99,15 @@ jobs:
           - platform: windows-latest
             qt_version: "6.9.0"
             target: x86_64
+          - platform: windows-latest
+            qt_version: "6.9.0"
+            target: x86_64-v3
           - platform: ubuntu-22.04
             qt_version: "6.9.0"
             target: amd64
+          - platform: ubuntu-22.04
+            qt_version: "6.9.0"
+            target: amd64-v3
           - platform: ubuntu-24.04-arm
             qt_version: "6.9.0"
             target: arm64
@@ -127,11 +133,13 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           submodules: "recursive"
+
       - name: Install mingw
         if: matrix.platform == 'windows-latest'
         uses: bwoodsend/setup-winlibs-action@v1.15
         with:
-          architecture: ${{ matrix.target }}
+          architecture: ${{ (matrix.target == 'x86_64-v3' || matrix.target == 'x86_64') && 'x86_64' || matrix.target }}
+
       - name: Download Artifacts
         uses: actions/download-artifact@v4.3.0
         with:
@@ -143,11 +151,27 @@ jobs:
         uses: actions/cache@v4.2.3
         with:
           path: qt6/build
+          # Use a unique cache key for each target to ensure Qt is built with the correct flags.
           key: QtStaticCache-${{ matrix.platform }}-${{ matrix.target }}-Qt${{ matrix.qt_version }}
+
       - name: Install Qt Windows
         shell: powershell
         if: matrix.platform == 'windows-latest' && steps.cache-static-Qt.outputs.cache-hit != 'true' && matrix.qt_version != '6.2.12'
+        env:
+          # Set CXXFLAGS so the Qt build script can use it. This ensures Qt itself is optimized for v3.
+          CXXFLAGS: ${{ matrix.target == 'x86_64-v3' && '-march=x86-64-v3' || '' }}
         run: ./script/build_qt_static_windows.bat ${{ matrix.qt_version }}
+
+      - name: Verify Static Qt Build
+        if: matrix.platform == 'windows-latest' && matrix.qt_version != '6.2.12' && steps.cache-static-Qt.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          if [ ! -f "qt6/build/lib/libQt6Core.a" ]; then
+            echo "::error::Static Qt library (libQt6Core.a) not found after build. The Qt static build process likely failed."
+            exit 1
+          fi
+          echo "Static Qt libraries found successfully."
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4.3.0
         if: matrix.platform != 'windows-latest'
@@ -157,20 +181,33 @@ jobs:
           cache: true
           cache-key-prefix: QtCache-${{ matrix.platform }}-${{ matrix.target }}
       # ========================================================================================================= Generate MakeFile and Build
-      - name: Windows - Generate MakeFile and Build
+      - name: Windows (x86_64) - Generate MakeFile and Build
+        if: matrix.platform == 'windows-latest' && matrix.qt_version == '6.9.0' && matrix.target == 'x86_64'
         shell: bash
-        if: matrix.platform == 'windows-latest' && matrix.qt_version != '6.2.12'
         run: |
           export CMAKE_PREFIX_PATH=$PWD/qt6/build/lib/cmake
           mkdir build
           cd build
-          cmake -GNinja -DCMAKE_CXX_FLAGS="-static" -DCMAKE_BUILD_TYPE=Debug ..
+          cmake -GNinja -DCMAKE_CXX_FLAGS="-static" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
           ninja -j2
           cd ..
           ./script/deploy_windows.sh
-      - name: Legacy Windows - Generate MakeFile and Build
+
+      - name: Windows (x86_64-v3) - Generate MakeFile and Build
+        if: matrix.platform == 'windows-latest' && matrix.qt_version == '6.9.0' && matrix.target == 'x86_64-v3'
         shell: bash
+        run: |
+          export CMAKE_PREFIX_PATH=$PWD/qt6/build/lib/cmake
+          mkdir build
+          cd build
+          cmake -GNinja -DCMAKE_CXX_FLAGS="-static -march=x86-64-v3" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
+          ninja -j2
+          cd ..
+          ./script/deploy_windows.sh ${{ matrix.target }}
+
+      - name: Legacy Windows - Generate MakeFile and Build
         if: matrix.platform == 'windows-latest' && matrix.qt_version == '6.2.12'
+        shell: bash
         run: |
           curl -L -o qt.7z https://github.com/throneproj/env_windows_legacy/releases/download/latest/qt-${{ matrix.target }}.7z
           7z x qt.7z
@@ -180,35 +217,34 @@ jobs:
           export OPENSSL_ROOT_DIR=$PWD/openssl
           mkdir build
           cd build
-          cmake -GNinja -DCMAKE_CXX_FLAGS="-static" -DCMAKE_BUILD_TYPE=Debug ..
+          cmake -GNinja -DCMAKE_CXX_FLAGS="-static" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
           ninja -j2
           cd ..
           ./script/deploy_windows.sh ${{ matrix.target }}
-      - name: Build Installer with NSIS
-        shell: cmd
-        if: matrix.platform == 'windows-latest' && matrix.qt_version != '6.2.12'
-        run: |
-          cp .\script\windows_installer.nsi .
-          makensis windows_installer.nsi
-          cp ThroneSetup.exe deployment/
+
       - name: Linux - Generate MakeFile and Build
-        shell: bash
         if: contains( matrix.platform, 'ubuntu' )
+        shell: bash
         run: |
           sudo apt update && sudo apt upgrade -y
           mkdir build
           cd build
-          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" ..
+          EXTRA_CXX_FLAGS=""
+          if [[ "${{ matrix.target }}" == "amd64-v3" ]]; then
+            EXTRA_CXX_FLAGS="-march=x86-64-v3"
+          fi
+          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$EXTRA_CXX_FLAGS" -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
           ninja
           cd ..
-          ./script/deploy_linux64.sh
+          ./script/deploy_linux64.sh ${{ matrix.target }}
+
       - name: macOS - Generate MakeFile and Build
-        shell: bash
         if: matrix.platform == 'macos-latest'
+        shell: bash
         run: |
           mkdir build
           cd build
-          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DNKR_PACKAGE_MACOS=1 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.target }} ..
+          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DNKR_PACKAGE_MACOS=1 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.target }} -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
           ninja
           cd ..
           ./script/deploy_macos.sh ${{ matrix.target }}
@@ -255,13 +291,20 @@ jobs:
           zip -9 -r $version_standalone-linux-amd64.zip Throne
           rm -rf Throne
           ####
+          mv linux-amd64-v3 Throne
+          zip -9 -r $version_standalone-linux-amd64-v3.zip Throne
+          rm -rf Throne
+          ####
           mv linux-arm64 Throne
           zip -9 -r $version_standalone-linux-arm64.zip Throne
           rm -rf Throne
           ####
-          mv ThroneSetup.exe $version_standalone-windows64-installer.exe
           mv windows64 Throne
           zip -9 -r $version_standalone-windows64.zip Throne
+          rm -rf Throne
+          ####
+          mv windows64-v3 Throne
+          zip -9 -r $version_standalone-windows64-v3.zip Throne
           rm -rf Throne
           ####
           mv windows32 Throne
@@ -289,7 +332,9 @@ jobs:
           rm -rf windows-arm64
           rm -rf linux-arm64
           rm -rf linux-amd64
+          rm -rf linux-amd64-v3
           rm -rf windows64
+          rm -rf windows64-v3
           rm -rf windows32
           rm -rf windowslegacy64
           rm -rf macos-amd64
