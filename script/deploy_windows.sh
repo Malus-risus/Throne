@@ -3,31 +3,36 @@ set -e
 
 source script/env_deploy.sh
 
-# This logic now correctly handles all targets, including the new x86_64-v3.
+# --- This logic determines the correct Go artifact to use ---
+# It is based on your original script, with a specific addition for v3.
 if [[ $1 == 'i686' ]]; then
-  ARCH="windowslegacy-386"
+  GO_ARCH_ARTIFACT="windowslegacy-386"
+elif [[ $1 == 'x86_64' ]]; then
+  GO_ARCH_ARTIFACT="windowslegacy-amd64"
+elif [[ $1 == 'x86_64-v3' ]]; then
+  GO_ARCH_ARTIFACT="windows-amd64-v3"
+else
+  GO_ARCH_ARTIFACT="windows-amd64"
+fi
+
+# --- This logic determines the final output directory ---
+if [[ $1 == 'i686' ]]; then
   DEST=$DEPLOYMENT/windows32
 elif [[ $1 == 'x86_64' ]]; then
-  # This case is for the legacy 64-bit build with Qt 6.2.12
-  ARCH="windowslegacy-amd64"
   DEST=$DEPLOYMENT/windowslegacy64
 elif [[ $1 == 'x86_64-v3' ]]; then
-  # This case is for the modern v3 build
-  ARCH="windows-amd64-v3"
   DEST=$DEPLOYMENT/windows64-v3
 else
-  # This is the default case for the modern standard x86_64 build
-  ARCH="windows-amd64"
   DEST=$DEPLOYMENT/windows64
 fi
+
 
 echo "---> Cleaning and creating destination: $DEST"
 rm -rf $DEST
 mkdir -p $DEST
 
 #### get the pdb ####
-# This part is likely only needed for Debug builds.
-# Since we are on Release, you might consider removing this block in the future.
+# This part is for Debug builds, can be removed if only using Release.
 if [ -f "./build/Throne.exe" ]; then
     echo "---> Processing PDB files..."
     curl -fLJO https://github.com/rainers/cv2pdb/releases/download/v0.53/cv2pdb-0.53.zip
@@ -46,41 +51,27 @@ fi
 echo "---> Copying C++ executable..."
 cp $BUILD/Throne.exe $DEST
 
-#### extract Go core ####
-echo "---> Extracting Go core for arch: $ARCH"
+# --- This is your original, reliable extraction logic ---
+echo "---> Extracting Go core for arch: $GO_ARCH_ARTIFACT"
 cd download-artifact
+cd *$GO_ARCH_ARTIFACT
+tar xvzf artifacts.tgz -C ../../
+cd ..
+echo "---> Extracting public resources..."
+cd *public_res
+tar xvzf artifacts.tgz -C ../../
+cd ../..
 
-# Find the directory for the corresponding Go artifact
-GO_ARTIFACT_DIR=$(find . -type d -name "*$ARCH" | head -n 1)
-if [ -z "$GO_ARTIFACT_DIR" ]; then
-    echo "::error:: Could not find Go artifact directory for ARCH: $ARCH"
-    exit 1
+
+# --- This is the new, targeted fix ONLY for the v3 build ---
+# It merges the Go core (extracted to a default location) into the correct v3 directory.
+if [[ $1 == 'x86_64-v3' ]]; then
+  echo "--> Merging v3 Go core into v3 C++ directory..."
+  # The v3 Go artifact extracts to './deployment/windows64' by default. We move its contents.
+  mv $DEPLOYMENT/windows64/* $DEST
+  # Then, remove the now-empty directory.
+  rm -rf $DEPLOYMENT/windows64
 fi
 
-echo "---> Found Go artifact directory: $GO_ARTIFACT_DIR"
-cd "$GO_ARTIFACT_DIR"
-
-# Extract here first, then move. This is more robust than using 'tar -C' with complex paths.
-echo "---> Unpacking Go core locally..."
-tar xvzf artifacts.tgz
-
-echo "---> Moving Go core files to final destination..."
-# The Go artifact contains a 'deployment' directory with the core files inside.
-mv ./deployment/* ../../$DEST
-
-cd ../..
-
-#### extract public_res ####
-echo "---> Extracting public resources..."
-cd download-artifact
-cd *public_res
-
-# Extract here first, then move.
-echo "---> Unpacking public resources locally..."
-tar xvzf artifacts.tgz
-
-echo "---> Moving public resource files to final destination..."
-# The public_res artifact contains a 'deployment/public_res' directory.
-mv ./deployment/public_res/* ../../$DEST
-
-cd ../..
+echo "---> Merging public resources..."
+mv $DEPLOYMENT/public_res/* $DEST
