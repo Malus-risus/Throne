@@ -60,10 +60,13 @@ fi
 echo "---> Found Go artifact directory: $GO_ARTIFACT_DIR"
 cd "$GO_ARTIFACT_DIR"
 
-# Extract the contents of the Go artifact's deployment dir directly into our $DEST
-# --strip-components=2 removes the './deployment/...' prefix from the paths.
-echo "---> Unpacking Go core into $DEST"
-tar xvzf artifacts.tgz --strip-components=2 -C ../../$DEST
+# Extract here first, then move. This is more robust than using 'tar -C' with complex paths.
+echo "---> Unpacking Go core locally..."
+tar xvzf artifacts.tgz
+
+echo "---> Moving Go core files to final destination..."
+# The Go artifact contains a 'deployment' directory with the core files inside.
+mv ./deployment/* ../../$DEST
 
 cd ../..
 
@@ -71,7 +74,13 @@ cd ../..
 echo "---> Extracting public resources..."
 cd download-artifact
 cd *public_res
-tar xvzf artifacts.tgz -C ../../
-cd ../..
 
-mv $DEPLOYMENT/public_res/* $DEST
+# Extract here first, then move.
+echo "---> Unpacking public resources locally..."
+tar xvzf artifacts.tgz
+
+echo "---> Moving public resource files to final destination..."
+# The public_res artifact contains a 'deployment/public_res' directory.
+mv ./deployment/public_res/* ../../$DEST
+
+cd ../..
