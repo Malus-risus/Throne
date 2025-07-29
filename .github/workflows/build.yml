@@ -18,27 +18,39 @@ jobs:
           - cross_os: public_res
             cross_arch: public_res
             go_version: "1.24.5"
+            go_arch_level: v1
           - cross_os: windows
             cross_arch: amd64
             go_version: "1.24.5"
+            go_arch_level: v1
+          - cross_os: windows
+            cross_arch: amd64
+            go_version: "1.24.5"
+            go_arch_level: v3
           - cross_os: linux
             cross_arch: amd64
             go_version: "1.24.5"
+            go_arch_level: v1
           - cross_os: linux
             cross_arch: arm64
             go_version: "1.24.5"
+            go_arch_level: v1
           - cross_os: darwin
             cross_arch: amd64
             go_version: "1.24.5"
+            go_arch_level: v1
           - cross_os: darwin
             cross_arch: arm64
             go_version: "1.24.5"
+            go_arch_level: v1
           - cross_os: windowslegacy
             cross_arch: amd64
             go_version: "1.24.5"
+            go_arch_level: v1
           - cross_os: windowslegacy
             cross_arch: 386
             go_version: "1.24.5"
+            go_arch_level: v1
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +61,7 @@ jobs:
         uses: actions/cache@v4.2.3
         with:
           path: artifacts.tgz
-          key: CommonCache-${{ matrix.cross_os }}-${{ matrix.cross_arch }}-${{ hashFiles('script/build_go.sh', 'core/*') }}-${{ matrix.go_version }}
+          key: CommonCache-${{ matrix.cross_os }}-${{ matrix.cross_arch }}-${{ matrix.go_arch_level }}-${{ hashFiles('script/build_go.sh', 'core/*') }}-${{ matrix.go_version }}
       - name: Install Golang
         if: steps.cache-common.outputs.cache-hit != 'true'
         uses: actions/setup-go@v5.5.0
@@ -76,6 +88,8 @@ jobs:
       - name: Build golang parts
         if: steps.cache-common.outputs.cache-hit != 'true'
         shell: bash
+        env:
+          GOAMD64: ${{ matrix.go_arch_level }}
         run: |
           [ ${{ matrix.cross_os }} == public_res ] || GOOS=${{ matrix.cross_os }} GOARCH=${{ matrix.cross_arch }} ./script/build_go.sh
           [ ${{ matrix.cross_os }} == public_res ] || exit 0
@@ -86,8 +100,9 @@ jobs:
       - name: Uploading Artifact
         uses: actions/upload-artifact@v4.6.2
         with:
-          name: Throne-${{ github.sha }}-Common-${{ matrix.cross_os }}-${{ matrix.cross_arch }}
+          name: Throne-${{ github.sha }}-Common-${{ matrix.cross_os }}-${{ matrix.cross_arch }}${{ matrix.go_arch_level != 'v1' && format('-{0}', matrix.go_arch_level) || '' }}
           path: artifacts.tgz
+
   build-cpp:
     permissions:
       contents: read
@@ -105,9 +120,6 @@ jobs:
           - platform: ubuntu-22.04
             qt_version: "6.9.0"
             target: amd64
-          - platform: ubuntu-22.04
-            qt_version: "6.9.0"
-            target: amd64-v3
           - platform: ubuntu-24.04-arm
             qt_version: "6.9.0"
             target: arm64
@@ -144,21 +156,19 @@ jobs:
         uses: actions/download-artifact@v4.3.0
         with:
           path: download-artifact
-      # ========================================================================================================= Qt Install
+
       - name: Qt static Cache
         id: cache-static-Qt
         if: matrix.platform == 'windows-latest' && matrix.qt_version != '6.2.12'
         uses: actions/cache@v4.2.3
         with:
           path: qt6/build
-          # Use a unique cache key for each target to ensure Qt is built with the correct flags.
           key: QtStaticCache-${{ matrix.platform }}-${{ matrix.target }}-Qt${{ matrix.qt_version }}
 
       - name: Install Qt Windows
         shell: powershell
         if: matrix.platform == 'windows-latest' && steps.cache-static-Qt.outputs.cache-hit != 'true' && matrix.qt_version != '6.2.12'
         env:
-          # Set CXXFLAGS so the Qt build script can use it. This ensures Qt itself is optimized for v3.
           CXXFLAGS: ${{ matrix.target == 'x86_64-v3' && '-march=x86-64-v3' || '' }}
         run: ./script/build_qt_static_windows.bat ${{ matrix.qt_version }}
 
@@ -180,7 +190,7 @@ jobs:
           setup-python: true
           cache: true
           cache-key-prefix: QtCache-${{ matrix.platform }}-${{ matrix.target }}
-      # ========================================================================================================= Generate MakeFile and Build
+
       - name: Windows (x86_64) - Generate MakeFile and Build
         if: matrix.platform == 'windows-latest' && matrix.qt_version == '6.9.0' && matrix.target == 'x86_64'
         shell: bash
@@ -229,11 +239,7 @@ jobs:
           sudo apt update && sudo apt upgrade -y
           mkdir build
           cd build
-          EXTRA_CXX_FLAGS=""
-          if [[ "${{ matrix.target }}" == "amd64-v3" ]]; then
-            EXTRA_CXX_FLAGS="-march=x86-64-v3"
-          fi
-          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$EXTRA_CXX_FLAGS" -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
+          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE ..
           ninja
           cd ..
           ./script/deploy_linux64.sh ${{ matrix.target }}
@@ -248,7 +254,7 @@ jobs:
           ninja
           cd ..
           ./script/deploy_macos.sh ${{ matrix.target }}
-      # ========================================================================================================= Deployments
+
       - name: Tar files
         shell: bash
         run: tar czvf artifacts.tgz ./deployment
@@ -257,6 +263,7 @@ jobs:
         with:
           name: Throne-${{ github.sha }}-${{ matrix.platform }}-${{ matrix.target }}-Qt${{ matrix.qt_version }}
           path: artifacts.tgz
+
   publish:
     name: Pack & Publish Release
     runs-on: ubuntu-latest
@@ -289,10 +296,6 @@ jobs:
           ####
           mv linux-amd64 Throne
           zip -9 -r $version_standalone-linux-amd64.zip Throne
-          rm -rf Throne
-          ####
-          mv linux-amd64-v3 Throne
-          zip -9 -r $version_standalone-linux-amd64-v3.zip Throne
           rm -rf Throne
           ####
           mv linux-arm64 Throne
@@ -332,7 +335,6 @@ jobs:
           rm -rf windows-arm64
           rm -rf linux-arm64
           rm -rf linux-amd64
-          rm -rf linux-amd64-v3
           rm -rf windows64
           rm -rf windows64-v3
           rm -rf windows32
