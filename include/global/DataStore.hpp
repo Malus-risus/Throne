@@ -1,6 +1,9 @@
 // DO NOT INCLUDE THIS
 
 #include "Const.hpp"
+#ifdef Q_OS_WIN
+#include "include/sys/windows/WinVersion.h"
+#endif
 
 namespace Configs {
 
@@ -11,11 +14,7 @@ namespace Configs {
         // DNS
         QString remote_dns = "tls://8.8.8.8";
         QString remote_dns_strategy = "";
-#ifdef Q_OS_WIN
         QString direct_dns = "localhost";
-#else
-        QString direct_dns = "dhcp://auto";
-#endif
         QString direct_dns_strategy = "";
         bool use_dns_object = false;
         QString dns_object = "";
@@ -127,6 +126,8 @@ namespace Configs {
         bool enable_tun_routing = false;
 #ifdef Q_OS_MACOS
         QString vpn_implementation = "gvisor";
+#elif defined(Q_OS_WIN)
+        QString vpn_implementation = WinVersion::IsBuildNumGreaterOrEqual(BuildNumber::Windows_10_1507) ? "system" : "gvisor";
 #else
         QString vpn_implementation = "system";
 #endif
