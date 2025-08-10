@@ -20,7 +20,7 @@
 #include <QInputDialog>
 #include <QToolTip>
 
-#define ADJUST_SIZE runOnThread([=] { adjustSize(); adjustPosition(mainwindow); }, this);
+#define ADJUST_SIZE runOnThread([=,this] { adjustSize(); adjustPosition(mainwindow); }, this);
 #define LOAD_TYPE(a) ui->type->addItem(Configs::ProfileManager::NewProxyEntity(a)->bean->DisplayType(), a);
 
 DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId, QWidget *parent)
@@ -31,7 +31,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
 
     // network changed
     network_title_base = ui->network_box->title();
-    connect(ui->network, &QComboBox::currentTextChanged, this, [=](const QString &txt) {
+    connect(ui->network, &QComboBox::currentTextChanged, this, [=,this](const QString &txt) {
         ui->network_box->setTitle(network_title_base.arg(txt));
         if (txt == "tcp") {
             ui->header_type->setVisible(true);
@@ -111,7 +111,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
     ui->network->removeItem(0);
 
     // security changed
-    connect(ui->security, &QComboBox::currentTextChanged, this, [=](const QString &txt) {
+    connect(ui->security, &QComboBox::currentTextChanged, this, [=,this](const QString &txt) {
         if (txt == "tls") {
             ui->security_box->setVisible(true);
             ui->tls_camouflage_box->setVisible(true);
@@ -134,8 +134,14 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
     });
     emit ui->security->currentTextChanged(ui->security->currentText());
 
+    // for fragment
+    connect(ui->tls_frag, &QCheckBox::checkStateChanged, this, [=,this](bool state)
+    {
+        ui->tls_frag_fall_delay->setEnabled(state);
+    });
+
     // mux setting changed
-    connect(ui->multiplex, &QComboBox::currentTextChanged, this, [=](const QString &txt) {
+    connect(ui->multiplex, &QComboBox::currentTextChanged, this, [=,this](const QString &txt) {
         if (txt == "Off") {
             ui->brutal_enable->setCheckState(Qt::CheckState::Unchecked);
             ui->brutal_box->setEnabled(false);
@@ -168,7 +174,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
         LOAD_TYPE("chain")
 
         // type changed
-        connect(ui->type, &QComboBox::currentIndexChanged, this, [=](int index) {
+        connect(ui->type, &QComboBox::currentIndexChanged, this, [=,this](int index) {
             typeSelected(ui->type->itemData(index).toString());
         });
 
@@ -213,7 +219,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         auto _innerWidget = new EditTrojanVLESS(this);
         innerWidget = _innerWidget;
         innerEditor = _innerWidget;
-        connect(_innerWidget->flow_, &QComboBox::currentTextChanged, _innerWidget, [=](const QString &txt)
+        connect(_innerWidget->flow_, &QComboBox::currentTextChanged, _innerWidget, [=,this](const QString &txt)
         {
             if (txt == "xtls-rprx-vision")
             {
@@ -287,6 +293,10 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         } else {
             ui->utlsFingerprint->setCurrentText(stream->utlsFingerprint);
         }
+        ui->tls_frag->setChecked(stream->enable_tls_fragment);
+        ui->tls_frag_fall_delay->setEnabled(stream->enable_tls_fragment);
+        ui->tls_frag_fall_delay->setText(stream->tls_fragment_fallback_delay);
+        ui->tls_rec_frag->setChecked(stream->enable_tls_record_fragment);
         ui->insecure->setChecked(stream->allow_insecure);
         ui->header_type->setCurrentText(stream->header_type);
         ui->headers->setText(stream->headers);
@@ -337,7 +347,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
     innerEditor->get_edit_text_name = [&]() { return ui->name->text(); };
     innerEditor->get_edit_text_serverAddress = [&]() { return ui->address->text(); };
     innerEditor->get_edit_text_serverPort = [&]() { return ui->port->text(); };
-    innerEditor->editor_cache_updated = [=] { editor_cache_updated_impl(); };
+    innerEditor->editor_cache_updated = [=,this] { editor_cache_updated_impl(); };
     innerEditor->onStart(ent);
 
     // 左边 common
@@ -397,7 +407,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
 
     // 第一次显示
     if (isHidden()) {
-        runOnThread([=] { show(); }, this);
+        runOnThread([=,this] { show(); }, this);
     }
 }
 
@@ -423,6 +433,9 @@ bool DialogEditProfile::onEnd() {
         stream->sni = ui->sni->text();
         stream->alpn = ui->alpn->text();
         stream->utlsFingerprint = ui->utlsFingerprint->currentText();
+        stream->enable_tls_fragment = ui->tls_frag->isChecked();
+        stream->tls_fragment_fallback_delay = ui->tls_frag_fall_delay->text();
+        stream->enable_tls_record_fragment = ui->tls_rec_frag->isChecked();
         stream->allow_insecure = ui->insecure->isChecked();
         stream->headers = ui->headers->text();
         stream->header_type = ui->header_type->currentText();
@@ -563,7 +576,7 @@ void DialogEditProfile::on_apply_to_group_clicked() {
 void DialogEditProfile::do_apply_to_group(const std::shared_ptr<Configs::Group> &group, QWidget *key) {
     auto stream = GetStreamSettings(ent->bean.get());
 
-    auto copyStream = [=](void *p) {
+    auto copyStream = [=,this](void *p) {
         for (const auto &profile: group->GetProfileEnts()) {
             auto newStream = GetStreamSettings(profile->bean.get());
             if (newStream == nullptr) continue;
@@ -574,7 +587,7 @@ void DialogEditProfile::do_apply_to_group(const std::shared_ptr<Configs::Group> 
         }
     };
 
-    auto copyBean = [=](void *p) {
+    auto copyBean = [=,this](void *p) {
         for (const auto &profile: group->GetProfileEnts()) {
             if (profile == ent) continue;
             profile->bean->_setValue(ent->bean->_name(p), p);
