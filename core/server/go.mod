@@ -11,7 +11,7 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/sing v0.7.0-beta.2
-	github.com/sagernet/sing-box v1.12.0
+	github.com/sagernet/sing-box v1.12.1
 	github.com/sagernet/sing-tun v0.7.0-beta.1
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/sys v0.34.0
