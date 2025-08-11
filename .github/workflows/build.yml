@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v4.3.0
+        uses: actions/checkout@v5.0.0
       - name: Cache Common Download
         id: cache-common
         uses: actions/cache@v4.2.4
@@ -142,7 +142,7 @@ jobs:
       INPUT_VERSION: ${{ github.event.inputs.tag }}
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v4.3.0
+        uses: actions/checkout@v5.0.0
         with:
           submodules: "recursive"
 
@@ -276,7 +276,7 @@ jobs:
       INPUT_VERSION: ${{ github.event.inputs.tag }}
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v4.3.0
+        uses: actions/checkout@v5.0.0
       - name: Download Artifacts
         uses: actions/download-artifact@v5.0.0
         with:
