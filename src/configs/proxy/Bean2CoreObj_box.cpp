@@ -171,6 +171,24 @@ namespace Configs {
         return result;
     }
 
+    CoreObjOutboundBuildResult AnyTLSBean::BuildCoreObjSingBox() {
+        CoreObjOutboundBuildResult result;
+
+        QJsonObject outbound{
+            {"type", "anytls"},
+            {"server", serverAddress},
+            {"server_port", serverPort},
+            {"password", password},
+            {"idle_session_check_interval", Int2String(idle_session_check_interval)+"s"},
+            {"idle_session_timeout", Int2String(idle_session_timeout)+"s"},
+            {"min_idle_session", min_idle_session},
+        };
+
+        stream->BuildStreamSettingsSingBox(&outbound);
+        result.outbound = outbound;
+        return result;
+    }
+
     CoreObjOutboundBuildResult VMessBean::BuildCoreObjSingBox() {
         CoreObjOutboundBuildResult result;
 
@@ -309,7 +327,7 @@ namespace Configs {
             {"system", useSystemInterface},
             {"workers", workerCount}
         };
-        if (enable_amenzia)
+        if (enable_amnezia)
         {
             outbound["junk_packet_count"] = junk_packet_count;
             outbound["junk_packet_min_size"] = junk_packet_min_size;

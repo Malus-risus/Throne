@@ -32,6 +32,7 @@ Apple platforms have a very strict security policy and since Throne does not hav
 - TUIC
 - Hysteria
 - Hysteria2
+- AnyTLS
 - Wireguard
 - SSH
 - Custom Outbound

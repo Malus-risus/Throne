@@ -5,6 +5,7 @@
 #include <include/configs/proxy/SocksHttpBean.hpp>
 #include <include/configs/proxy/TrojanVLESSBean.hpp>
 #include <include/configs/proxy/VMessBean.hpp>
+#include <include/configs/proxy/AnyTLSBean.hpp>
 #include <include/configs/proxy/WireguardBean.h>
 
 #include "include/configs/proxy/ExtraCore.h"
@@ -213,6 +214,32 @@ namespace Configs
         return true;
     }
 
+    bool AnyTLSBean::TryParseJson(const QJsonObject& obj)
+    {
+        name = obj["tag"].toString();
+        serverAddress = obj["server"].toString();
+        serverPort = obj["server_port"].toInt();
+        password = obj["password"].toString();
+        idle_session_check_interval = obj["idle_session_check_interval"].toInt();
+        idle_session_timeout = obj["idle_session_timeout"].toInt();
+        min_idle_session = obj["min_idle_session"].toInt();
+        stream->security = obj["tls"].isObject() ? "tls" : "";
+        if (obj["tls"].toObject()["reality"].toObject()["enabled"].toBool())
+        {
+            stream->security = "reality";
+        }
+        stream->reality_pbk = obj["tls"].toObject()["reality"].toObject()["public_key"].toString();
+        stream->reality_sid = obj["tls"].toObject()["reality"].toObject()["short_id"].toString();
+        stream->utlsFingerprint = obj["tls"].toObject()["utls"].toObject()["fingerprint"].toString();
+        stream->enable_tls_fragment = obj["tls"].toObject()["fragment"].toBool();
+        stream->tls_fragment_fallback_delay = obj["tls"].toObject()["fragment_fallback_delay"].toString();
+        stream->enable_tls_record_fragment = obj["tls"].toObject()["record_fragment"].toBool();
+        stream->sni = obj["tls"].toObject()["server_name"].toString();
+        stream->alpn = obj["tls"].toObject()["alpn"].isArray() ? QJsonArray2QListString(obj["tls"].toObject()["alpn"].toArray()).join(",") : obj["tls"].toObject()["alpn"].toString();
+        stream->allow_insecure = obj["tls"].toObject()["insecure"].toBool();
+        return true;
+    }
+
     bool WireguardBean::TryParseJson(const QJsonObject& obj)
     {
         name = obj["tag"].toString();
@@ -240,7 +267,7 @@ namespace Configs
         transport_packet_magic_header = obj["transport_packet_magic_header"].toInt();
         if (junk_packet_count > 0 || junk_packet_min_size > 0 || junk_packet_max_size > 0)
         {
-            enable_amenzia = true;
+            enable_amnezia = true;
         }
 
         return true;
