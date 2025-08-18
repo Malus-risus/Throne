@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
       - name: Cache Common Download
         id: cache-common
         uses: actions/cache@v4.2.3
@@ -119,7 +119,7 @@ jobs:
       INPUT_VERSION: ${{ github.event.inputs.tag }}
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
         with:
           submodules: "recursive"
       - name: Install mingw
@@ -228,7 +228,7 @@ jobs:
       INPUT_VERSION: ${{ github.event.inputs.tag }}
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
       - name: Download Artifacts
         uses: actions/download-artifact@v4.3.0
         with:
