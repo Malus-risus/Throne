@@ -14,7 +14,7 @@ require (
 	github.com/sagernet/sing-tun v0.7.2
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/sys v0.35.0
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.10
 )
 
 replace github.com/sagernet/sing-box => github.com/throneproj/sing-box v1.11.16-0.20250923115053-308d2d6fe6a9
