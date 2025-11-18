@@ -119,7 +119,7 @@ public:
 
     static QString singBoxToXray(const QJsonObject &sing)
     {
-        if (isXrayFormat(sing)) return QJsonDocument(sing).toJson(QJsonDocument::Indented).replace("\\/", "/");
+        if (isXrayFormat(sing)) return QJsonDocument(sing).toJson(QJsonDocument::Compact).replace("\\/", "/");
 
         QJsonObject xray;
 
@@ -200,7 +200,7 @@ public:
             }
         }
 
-        return QJsonDocument(xray).toJson(QJsonDocument::Indented).replace("\\/", "/");
+        return QJsonDocument(xray).toJson(QJsonDocument::Compact).replace("\\/", "/");
     }
 
 private:
