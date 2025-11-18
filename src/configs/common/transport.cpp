@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include <QUrlQuery>
 #include <include/global/Utils.hpp>
+#include <include/global/XhttpExtraConverter.hpp>
 
 #include "include/configs/common/utils.h"
 
@@ -81,6 +82,8 @@ namespace Configs {
         if (query.hasQueryItem("max_early_data")) max_early_data = query.queryItemValue("max_early_data").toInt();
         if (query.hasQueryItem("early_data_header_name")) early_data_header_name = query.queryItemValue("early_data_header_name");
         if (query.hasQueryItem("serviceName")) service_name = query.queryItemValue("serviceName");
+        if (query.hasQueryItem("mode")) xhttp_mode = query.queryItemValue("mode");
+        if (query.hasQueryItem("extra")) xhttp_extra = query.queryItemValue("extra");
         return true;
     }
     bool Transport::ParseFromJson(const QJsonObject& object)
@@ -98,6 +101,10 @@ namespace Configs {
         if (object.contains("max_early_data")) max_early_data = object["max_early_data"].toInt();
         if (object.contains("early_data_header_name")) early_data_header_name = object["early_data_header_name"].toString();
         if (object.contains("service_name")) service_name = object["service_name"].toString();
+        if (object.contains("mode")) {
+            xhttp_mode = object["mode"].toString();
+            xhttp_extra = XhttpExtraConverter::singBoxToXray(object);
+        }
         return true;
     }
     QString Transport::ExportToLink()
@@ -113,6 +120,8 @@ namespace Configs {
         if (max_early_data > 0) query.addQueryItem("max_early_data", QString::number(max_early_data));
         if (!early_data_header_name.isEmpty()) query.addQueryItem("early_data_header_name", early_data_header_name);
         if (!service_name.isEmpty()) query.addQueryItem("serviceName", service_name);
+        if (!xhttp_mode.isEmpty()) query.addQueryItem("mode", xhttp_mode);
+        if (!xhttp_extra.isEmpty()) query.addQueryItem("extra", xhttp_extra);
         return query.toString();
     }
     QJsonObject Transport::ExportToJson()
@@ -130,6 +139,8 @@ namespace Configs {
         if (max_early_data > 0) object["max_early_data"] = max_early_data;
         if (!early_data_header_name.isEmpty()) object["early_data_header_name"] = early_data_header_name;
         if (!service_name.isEmpty()) object["service_name"] = service_name;
+        if (!xhttp_mode.isEmpty()) object["mode"] = xhttp_mode;
+        if (!xhttp_extra.isEmpty()) XhttpExtraConverter::mergeQJsonObject(object, XhttpExtraConverter::xrayToSingBox(xhttp_extra));
         return object;
     }
     BuildResult Transport::Build()

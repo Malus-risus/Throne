@@ -23,6 +23,10 @@ namespace Configs
         // gRPC
         QString service_name;
 
+        // xhttp
+        QString xhttp_mode;
+        QString xhttp_extra;
+
         Transport()
         {
             _add(new configItem("type", &type, string));
@@ -35,6 +39,8 @@ namespace Configs
             _add(new configItem("max_early_data", &max_early_data, integer));
             _add(new configItem("early_data_header_name", &early_data_header_name, string));
             _add(new configItem("service_name", &service_name, string));
+            _add(new configItem("xhttp_mode", &xhttp_mode, string));
+            _add(new configItem("xhttp_extra", &xhttp_extra, string));
         }
 
         QString getHeadersString();

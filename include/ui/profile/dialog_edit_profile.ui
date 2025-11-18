@@ -247,6 +247,11 @@
                <string notr="true">quic</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string notr="true">xhttp</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
@@ -433,6 +438,47 @@
          </item>
          <item row="5" column="1">
           <widget class="MyLineEdit" name="ws_early_data_name"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="xhttp_mode_l">
+           <property name="text">
+            <string notr="true">Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="xhttp_mode">
+           <item>
+            <property name="text">
+             <string notr="true">auto</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">packet-up</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">stream-up</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">stream-one</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="xhttp_extra_l">
+           <property name="text">
+            <string notr="true">Extra</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="MyLineEdit" name="xhttp_extra"/>
          </item>
         </layout>
        </widget>
@@ -713,6 +759,8 @@
   <tabstop>host</tabstop>
   <tabstop>ws_early_data_length</tabstop>
   <tabstop>ws_early_data_name</tabstop>
+  <tabstop>xhttp_mode</tabstop>
+  <tabstop>xhttp_extra</tabstop>
   <tabstop>insecure</tabstop>
   <tabstop>certificate_edit</tabstop>
   <tabstop>sni</tabstop>

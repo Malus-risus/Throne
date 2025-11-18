@@ -66,6 +66,15 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
             ui->path_l->setVisible(true);
             ui->host->setVisible(true);
             ui->host_l->setVisible(true);
+        } else if (txt == "xhttp") {
+            ui->headers->setVisible(false);
+            ui->headers_l->setVisible(false);
+            ui->method->setVisible(false);
+            ui->method_l->setVisible(false);
+            ui->path->setVisible(true);
+            ui->path_l->setVisible(true);
+            ui->host->setVisible(true);
+            ui->host_l->setVisible(true);
         } else {
             ui->headers->setVisible(false);
             ui->headers_l->setVisible(false);
@@ -86,6 +95,17 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
             ui->ws_early_data_length_l->setVisible(false);
             ui->ws_early_data_name->setVisible(false);
             ui->ws_early_data_name_l->setVisible(false);
+        }
+        if (txt == "xhttp") {
+            ui->xhttp_mode->setVisible(true);
+            ui->xhttp_mode_l->setVisible(true);
+            ui->xhttp_extra->setVisible(true);
+            ui->xhttp_extra_l->setVisible(true);
+        } else {
+            ui->xhttp_mode->setVisible(false);
+            ui->xhttp_mode_l->setVisible(false);
+            ui->xhttp_extra->setVisible(false);
+            ui->xhttp_extra_l->setVisible(false);
         }
         if (!ui->utlsFingerprint->count()) ui->utlsFingerprint->addItems(Preset::SingBox::UtlsFingerPrint);
         int networkBoxVisible = 0;
@@ -302,6 +322,8 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         ui->headers->setText(transport->getHeadersString());
         ui->ws_early_data_name->setText(transport->early_data_header_name);
         ui->ws_early_data_length->setText(Int2String(transport->max_early_data));
+        ui->xhttp_mode->setCurrentText(transport->xhttp_mode);
+        ui->xhttp_extra->setText(transport->xhttp_extra);
         ui->reality_pbk->setText(tls->reality->public_key);
         ui->reality_sid->setText(tls->reality->short_id);
         CACHE.certificate = tls->certificate;
@@ -412,6 +434,8 @@ bool DialogEditProfile::onEnd() {
         transport->method = ui->method->text();
         transport->early_data_header_name = ui->ws_early_data_name->text();
         transport->max_early_data = ui->ws_early_data_length->text().toInt();
+        transport->xhttp_mode = ui->xhttp_mode->currentText();
+        transport->xhttp_extra = ui->xhttp_extra->text();
         tls->reality->public_key = ui->reality_pbk->text();
         tls->reality->short_id = ui->reality_sid->text();
         tls->certificate = CACHE.certificate;
