@@ -140,7 +140,7 @@ namespace Configs {
         if (!early_data_header_name.isEmpty()) object["early_data_header_name"] = early_data_header_name;
         if (!service_name.isEmpty()) object["service_name"] = service_name;
         if (!xhttp_mode.isEmpty()) object["mode"] = xhttp_mode;
-        if (!xhttp_extra.isEmpty()) XhttpExtraConverter::mergeQJsonObject(object, XhttpExtraConverter::xrayToSingBox(xhttp_extra));
+        if (!xhttp_extra.isEmpty()) mergeJsonObjects(object, XhttpExtraConverter::xrayToSingBox(xhttp_extra));
         return object;
     }
     BuildResult Transport::Build()

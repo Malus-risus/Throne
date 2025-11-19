@@ -8,13 +8,6 @@
 class XhttpExtraConverter
 {
 public:
-    static void mergeQJsonObject(QJsonObject &obj1, const QJsonObject &obj2)
-    {
-        for (auto it = obj2.constBegin(); it != obj2.constEnd(); it++) {
-            obj1.insert(it.key(), it.value());
-        }
-    }
-
     static QJsonObject xrayToSingBox(const QString &xrayExtra)
     {
         if (xrayExtra.trimmed().isEmpty()) return {};
