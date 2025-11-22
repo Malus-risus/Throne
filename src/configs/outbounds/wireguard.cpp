@@ -13,8 +13,8 @@ namespace Configs {
         if (!url.isValid()) return false;
         auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
 
-        if (query.hasQueryItem("address")) address = query.queryItemValue("address");
-        if (query.hasQueryItem("port")) port = query.queryItemValue("port").toInt();
+        address = url.host();
+        port = url.port();
         if (query.hasQueryItem("public_key")) public_key = query.queryItemValue("public_key");
         if (query.hasQueryItem("peer_public_key")) public_key = query.queryItemValue("peer_public_key");
         if (query.hasQueryItem("pre_shared_key")) pre_shared_key = query.queryItemValue("pre_shared_key");
@@ -49,8 +49,6 @@ namespace Configs {
     QString Peer::ExportToLink()
     {
         QUrlQuery query;
-        if (!address.isEmpty()) query.addQueryItem("address", address);
-        if (port > 0) query.addQueryItem("port", QString::number(port));
         if (!public_key.isEmpty()) query.addQueryItem("public_key", public_key);
         if (!pre_shared_key.isEmpty()) query.addQueryItem("pre_shared_key", pre_shared_key);
         if (!reserved.isEmpty()) {
@@ -174,12 +172,21 @@ namespace Configs {
         if (object.isEmpty() || object["type"].toString() != "wireguard") return false;
         outbound::ParseFromJson(object);
         if (object.contains("private_key")) private_key = object["private_key"].toString();
-        if (object.contains("peer") && object["peer"].isObject()) peer->ParseFromJson(object["peer"].toObject());
+        if (object.contains("peers") && object["peers"].isArray() && !object["peers"].toArray().empty()) peer->ParseFromJson(object["peers"].toArray()[0].toObject());
         if (object.contains("address")) address = QJsonArray2QListString(object["address"].toArray());
         if (object.contains("mtu")) mtu = object["mtu"].toInt();
         if (object.contains("system")) system = object["system"].toBool();
         if (object.contains("worker_count")) worker_count = object["worker_count"].toInt();
         if (object.contains("udp_timeout")) udp_timeout = object["udp_timeout"].toString();
+        if (object.contains("junk_packet_count")) junk_packet_count = object["junk_packet_count"].toInt(), enable_amnezia = true;
+        if (object.contains("junk_packet_min_size")) junk_packet_min_size = object["junk_packet_min_size"].toInt(), enable_amnezia = true;
+        if (object.contains("junk_packet_max_size")) junk_packet_max_size = object["junk_packet_max_size"].toInt(), enable_amnezia = true;
+        if (object.contains("init_packet_junk_size")) init_packet_junk_size = object["init_packet_junk_size"].toInt(), enable_amnezia = true;
+        if (object.contains("response_packet_junk_size")) response_packet_junk_size = object["response_packet_junk_size"].toInt(), enable_amnezia = true;
+        if (object.contains("init_packet_magic_header")) init_packet_magic_header = object["init_packet_magic_header"].toInt(), enable_amnezia = true;
+        if (object.contains("response_packet_magic_header")) response_packet_magic_header = object["response_packet_magic_header"].toInt(), enable_amnezia = true;
+        if (object.contains("underload_packet_magic_header")) underload_packet_magic_header = object["underload_packet_magic_header"].toInt(), enable_amnezia = true;
+        if (object.contains("transport_packet_magic_header")) transport_packet_magic_header = object["transport_packet_magic_header"].toInt(), enable_amnezia = true;
         return true;
     }
 
@@ -232,6 +239,17 @@ namespace Configs {
         if (system) object["system"] = system;
         if (worker_count > 0) object["worker_count"] = worker_count;
         if (!udp_timeout.isEmpty()) object["udp_timeout"] = udp_timeout;
+        if (enable_amnezia) {
+            if (junk_packet_count > 0) object["junk_packet_count"] = junk_packet_count;
+            if (junk_packet_min_size > 0) object["junk_packet_min_size"] = junk_packet_min_size;
+            if (junk_packet_max_size > 0) object["junk_packet_max_size"] = junk_packet_max_size;
+            if (init_packet_junk_size > 0) object["init_packet_junk_size"] = init_packet_junk_size;
+            if (response_packet_junk_size > 0) object["response_packet_junk_size"] = response_packet_junk_size;
+            if (init_packet_magic_header > 0) object["init_packet_magic_header"] = init_packet_magic_header;
+            if (response_packet_magic_header > 0) object["response_packet_magic_header"] = response_packet_magic_header;
+            if (underload_packet_magic_header > 0) object["underload_packet_magic_header"] = underload_packet_magic_header;
+            if (transport_packet_magic_header > 0) object["transport_packet_magic_header"] = transport_packet_magic_header;
+        }
         
         auto peerObj = peer->ExportToJson();
         if (!peerObj.isEmpty()) {
@@ -253,6 +271,17 @@ namespace Configs {
         if (system) object["system"] = system;
         if (worker_count > 0) object["worker_count"] = worker_count;
         if (!udp_timeout.isEmpty()) object["udp_timeout"] = udp_timeout;
+        if (enable_amnezia) {
+            if (junk_packet_count > 0) object["junk_packet_count"] = junk_packet_count;
+            if (junk_packet_min_size > 0) object["junk_packet_min_size"] = junk_packet_min_size;
+            if (junk_packet_max_size > 0) object["junk_packet_max_size"] = junk_packet_max_size;
+            if (init_packet_junk_size > 0) object["init_packet_junk_size"] = init_packet_junk_size;
+            if (response_packet_junk_size > 0) object["response_packet_junk_size"] = response_packet_junk_size;
+            if (init_packet_magic_header > 0) object["init_packet_magic_header"] = init_packet_magic_header;
+            if (response_packet_magic_header > 0) object["response_packet_magic_header"] = response_packet_magic_header;
+            if (underload_packet_magic_header > 0) object["underload_packet_magic_header"] = underload_packet_magic_header;
+            if (transport_packet_magic_header > 0) object["transport_packet_magic_header"] = transport_packet_magic_header;
+        }
 
         auto peerObj = peer->Build().object;
         if (!peerObj.isEmpty()) {
@@ -269,6 +298,13 @@ namespace Configs {
         return peer->address;
     }
 
+    void wireguard::SetPort(int newPort) {
+        peer->port = newPort;
+    }
+
+    QString wireguard::GetPort() {
+        return QString::number(peer->port);
+    }
 
     QString wireguard::DisplayAddress()
     {

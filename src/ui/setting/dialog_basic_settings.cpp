@@ -108,6 +108,30 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
     //
     ui->theme->addItems(QStyleFactory::keys());
     ui->theme->addItem("QDarkStyle");
+    ui->enable_custom_icon->setChecked(Configs::dataStore->use_custom_icons);
+    connect(ui->select_custom_icon, &QPushButton::clicked, this, [=, this] {
+        auto n = QMessageBox::information(this, "Custom Icon Manual", tr(Configs::Information::CustomIconManual.toStdString().c_str()), QMessageBox::Open | QMessageBox::Cancel);
+        if (n == QMessageBox::Open) {
+            auto fileNames = QFileDialog::getOpenFileNames(this,
+                tr("Select png icons"), QDir::homePath(), tr("Image Files (*.png)"));
+            // process files
+            QString errors;
+            for (const auto& fileName : fileNames) {
+                CACHE.updateTrayIcon = true;
+                QFileInfo fileInfo(fileName);
+                if (auto pixMap = QPixmap(fileName); pixMap.isNull()) errors += "Failed to load " + fileName + "\n";
+                else if (pixMap.width() != pixMap.height()) errors += "Image does not have equal width and height: " + fileName + "\n";
+                else if (!Configs::Information::iconNames.contains(fileInfo.fileName())) errors += "Icon name is not valid: " + fileInfo.fileName() + "\n";
+                else {
+                    QFile::remove(QDir("icons").filePath(fileInfo.fileName()));
+                    if (!QFile::copy(fileName, QDir("icons").filePath(fileInfo.fileName()))) errors += "Failed to copy " + fileName + "\n";
+                }
+            }
+            if (!errors.isEmpty()) {
+                QMessageBox::warning(this, "Select custom image error", errors);
+            }
+        }
+    });
     //
     bool ok;
     auto themeId = Configs::dataStore->theme.toInt(&ok);
@@ -117,7 +141,7 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
         ui->theme->setCurrentText(Configs::dataStore->theme);
     }
     //
-    connect(ui->theme, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [=,this](int index) {
+    connect(ui->theme, &QComboBox::currentIndexChanged, this, [=,this](int index) {
         themeManager->ApplyTheme(ui->theme->currentText());
         Configs::dataStore->theme = ui->theme->currentText();
         Configs::dataStore->Save();
@@ -205,6 +229,9 @@ void DialogBasicSettings::accept() {
 
     Configs::dataStore->enable_stats = ui->connection_statistics->isChecked();
     Configs::dataStore->language = ui->language->currentIndex();
+    auto oldUseCustomIcon = Configs::dataStore->use_custom_icons;
+    Configs::dataStore->use_custom_icons = ui->enable_custom_icon->isChecked();
+    if (oldUseCustomIcon != Configs::dataStore->use_custom_icons) CACHE.updateTrayIcon = true;
     D_SAVE_BOOL(start_minimal)
     D_SAVE_INT(max_log_line)
     Configs::dataStore->show_system_dns = ui->show_sys_dns->isChecked();
@@ -255,6 +282,7 @@ void DialogBasicSettings::accept() {
     if (CACHE.needRestart) str << "NeedRestart";
     if (CACHE.updateDisableTray) str << "UpdateDisableTray";
     if (CACHE.updateSystemDns) str << "UpdateSystemDns";
+    if (CACHE.updateTrayIcon) str << "UpdateTrayIcon";
     if (needChoosePort) str << "NeedChoosePort";
     MW_dialog_message(Dialog_DialogBasicSettings, str.join(","));
     QDialog::accept();

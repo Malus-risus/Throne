@@ -237,6 +237,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             dashFile.close();
         }
     }
+    if (auto dashDir = QDir("icons"); !dashDir.exists("icons")) {
+        QDir().mkdir("icons") ? qDebug("created icons dir") : qDebug("Failed to create icons dir");
+    }
 
     // top bar
     ui->toolButton_program->setMenu(ui->menu_program);
@@ -760,7 +763,7 @@ void MainWindow::show_group(int gid) {
 
 void MainWindow::dialog_message_impl(const QString &sender, const QString &info) {
     // info
-    if (info.contains("UpdateIcon")) {
+    if (info.contains("UpdateTrayIcon")) {
         icon_status = -1;
         refresh_status();
     }

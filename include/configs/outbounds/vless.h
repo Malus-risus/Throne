@@ -14,7 +14,7 @@ namespace Configs
         QString uuid;
         QString flow;
         std::shared_ptr<TLS> tls = std::make_shared<TLS>();
-        QString packet_encoding;
+        QString packet_encoding = "xudp";
         std::shared_ptr<Multiplex> multiplex = std::make_shared<Multiplex>();
         std::shared_ptr<Transport> transport = std::make_shared<Transport>();
 

@@ -20,8 +20,8 @@
 
 #include <QInputDialog>
 
+#include "include/ui/profile/edit_advanced.h"
 #include "include/ui/profile/edit_hysteria.h"
-#include "include/ui/profile/edit_hysteria2.h"
 #include "include/ui/profile/edit_socks.h"
 #include "include/ui/profile/edit_trojan.h"
 #include "include/ui/profile/edit_tuic.h"
@@ -146,6 +146,12 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
         }
     });
 
+    // Advanced options
+    connect(ui->advanced_button, &QPushButton::clicked, this, [=,this]() {
+        auto advancedWidget = new EditAdvanced(this, ent);
+        advancedWidget->show();
+    });
+
     newEnt = _type != "";
     if (newEnt) {
         this->groupId = profileOrGroupId;
@@ -159,7 +165,6 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
         LOAD_TYPE("vmess")
         LOAD_TYPE("vless")
         LOAD_TYPE("hysteria")
-        LOAD_TYPE("hysteria2")
         LOAD_TYPE("tuic")
         LOAD_TYPE("anytls")
         LOAD_TYPE("wireguard")
@@ -236,10 +241,11 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         auto _innerWidget = new EditHysteria(this);
         innerWidget = _innerWidget;
         innerEditor = _innerWidget;
-    } else if (type == "hysteria2") {
-        auto _innerWidget = new EditHysteria2(this);
-        innerWidget = _innerWidget;
-        innerEditor = _innerWidget;
+        connect(_innerWidget->_protocol_version, &QComboBox::currentTextChanged, _innerWidget, [=,this](const QString &txt)
+        {
+            _innerWidget->editHysteriaLayout(txt);
+            ADJUST_SIZE
+        });
     } else if (type == "tuic") {
         auto _innerWidget = new EditTuic(this);
         innerWidget = _innerWidget;
@@ -302,6 +308,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
             ui->security->setEnabled(false);
         } else {
             ui->security->setCurrentText(tls->enabled ? "tls" : "");
+            ui->security->setEnabled(true);
         }
         ui->network->setCurrentText(transport->type);
         ui->path->setText(transport->path);
@@ -356,8 +363,8 @@ void DialogEditProfile::typeSelected(const QString &newType) {
 
     // 左边 common
     ui->name->setText(ent->outbound->name);
-    ui->address->setText(ent->outbound->server);
-    ui->port->setText(Int2String(ent->outbound->server_port));
+    ui->address->setText(ent->outbound->GetAddress());
+    ui->port->setText(ent->outbound->GetPort());
     ui->port->setValidator(QRegExpValidator_Number);
 
     // 星号
@@ -365,9 +372,15 @@ void DialogEditProfile::typeSelected(const QString &newType) {
     if (ent->outbound->HasTransport()) {
         ui->network_l->setVisible(true);
         ui->network->setVisible(true);
+        if (ui->network->currentText() == "tcp") {
+            ui->network_box->setVisible(false);
+        } else {
+            ui->network_box->setVisible(true);
+        }
     } else {
         ui->network_l->setVisible(false);
         ui->network->setVisible(false);
+        ui->network_box->setVisible(false);
     }
     if (ent->outbound->HasTLS()) {
         ui->security->setVisible(true);
@@ -392,7 +405,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
     ui->stream_box->setVisible(streamBoxVisible);
 
     auto rightNoBox = (ui->security_box->isHidden() && ui->network_box->isHidden() && ui->tls_camouflage_box->isHidden());
-    if (rightNoBox && !ui->right_all_w->isHidden()) {
+    if (rightNoBox && !ent->outbound->HasTLS() && !ent->outbound->HasTransport() && !ui->right_all_w->isHidden()) {
         ui->right_all_w->setVisible(false);
     }
 
@@ -412,8 +425,8 @@ bool DialogEditProfile::onEnd() {
     }
 
     ent->outbound->name = ui->name->text();
-    ent->outbound->server = ui->address->text().remove(' ');
-    ent->outbound->server_port = ui->port->text().toInt();
+    ent->outbound->SetAddress(ui->address->text().remove(' '));
+    ent->outbound->SetPort(ui->port->text().toInt());
 
     if (ent->outbound->HasTLS() || ent->outbound->HasTransport()) {
         auto tls = ent->outbound->GetTLS();
@@ -494,9 +507,9 @@ void DialogEditProfile::editor_cache_updated_impl() {
 
 void DialogEditProfile::on_certificate_edit_clicked() {
     bool ok;
-    auto txt = QInputDialog::getMultiLineText(this, tr("Certificate"), "", CACHE.certificate, &ok);
+    auto txt = QInputDialog::getMultiLineText(this, tr("Certificate"), "", CACHE.certificate.join("\n"), &ok);
     if (ok) {
-        CACHE.certificate = txt;
+        CACHE.certificate = txt.split("\n", Qt::SkipEmptyParts);
         editor_cache_updated_impl();
     }
 }

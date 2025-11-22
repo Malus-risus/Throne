@@ -19,7 +19,7 @@ namespace Configs
         bool global_padding = false;
         bool authenticated_length = false;
         std::shared_ptr<TLS> tls = std::make_shared<TLS>();
-        QString packet_encoding;
+        QString packet_encoding = "xudp";
         std::shared_ptr<Transport> transport = std::make_shared<Transport>();
         std::shared_ptr<Multiplex> multiplex = std::make_shared<Multiplex>();
 

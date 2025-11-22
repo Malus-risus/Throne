@@ -50,6 +50,14 @@ namespace Configs
             return server;
         }
 
+        virtual void SetPort(int newPort) {
+            server_port = newPort;
+        }
+
+        virtual QString GetPort() {
+            return QString::number(server_port);
+        }
+
         virtual QString DisplayAddress()
         {
             return ::DisplayAddress(server, server_port);

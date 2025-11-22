@@ -21,6 +21,9 @@ public:
 
     bool onEnd() override;
 
+    QComboBox *_protocol_version;
+
+    void editHysteriaLayout(const QString& version);
 private:
     Ui::EditHysteria *ui;
     std::shared_ptr<Configs::ProxyEntity> ent;

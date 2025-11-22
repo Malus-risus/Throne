@@ -42,7 +42,7 @@ private:
     QString network_title_base;
 
     struct {
-        QString certificate;
+        QStringList certificate;
     } CACHE;
 
     void typeSelected(const QString &newType);

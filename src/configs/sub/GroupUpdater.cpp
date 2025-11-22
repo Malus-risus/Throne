@@ -171,17 +171,10 @@ namespace Subscription {
             if (!ok) return;
         }
 
-        // Hysteria1
-        if (str.startsWith("hysteria://")) {
+        // Hysteria
+        if (str.startsWith("hysteria://") || str.startsWith("hysteria2://") || str.startsWith("hy2://")) {
             ent = Configs::ProfileManager::NewProxyEntity("hysteria");
             auto ok = ent->Hysteria()->ParseFromLink(str);
-            if (!ok) return;
-        }
-
-        // Hysteria2
-        if (str.startsWith("hysteria2://") || str.startsWith("hy2://")) {
-            ent = Configs::ProfileManager::NewProxyEntity("hysteria2");
-            auto ok = ent->Hysteria2()->ParseFromLink(str);
             if (!ok) return;
         }
 
@@ -288,17 +281,10 @@ namespace Subscription {
                 if (!ok) continue;
             }
 
-            // Hysteria1
-            if (out["type"] == "hysteria") {
+            // Hysteria
+            if (out["type"] == "hysteria" || out["type"] == "hysteria2") {
                 ent = Configs::ProfileManager::NewProxyEntity("hysteria");
                 auto ok = ent->Hysteria()->ParseFromJson(out);
-                if (!ok) continue;
-            }
-
-            // Hysteria2
-            if (out["type"] == "hysteria2") {
-                ent = Configs::ProfileManager::NewProxyEntity("hysteria2");
-                auto ok = ent->Hysteria2()->ParseFromJson(out);
                 if (!ok) continue;
             }
 
@@ -521,6 +507,9 @@ namespace Subscription {
                         bean->transport->path = Node2QString(ws["path"]);
                         bean->transport->max_early_data = Node2Int(ws["max-early-data"]);
                         bean->transport->early_data_header_name = Node2QString(ws["early-data-header-name"]);
+                        if (Node2Bool(ws["v2ray-http-upgrade"])) {
+                            bean->transport->type = "httpupgrade";
+                        }
                     }
 
                     auto grpc = NodeChild(proxy, {"grpc-opts", "grpc-opt"});
@@ -581,6 +570,9 @@ namespace Subscription {
                         bean->transport->path = Node2QString(ws["path"]);
                         bean->transport->max_early_data = Node2Int(ws["max-early-data"]);
                         bean->transport->early_data_header_name = Node2QString(ws["early-data-header-name"]);
+                        if (Node2Bool(ws["v2ray-http-upgrade"])) {
+                            bean->transport->type = "httpupgrade";
+                        }
                     }
 
                     auto grpc = NodeChild(proxy, {"grpc-opts", "grpc-opt"});
@@ -634,6 +626,9 @@ namespace Subscription {
                         bean->transport->path = Node2QString(ws["path"]);
                         bean->transport->max_early_data = Node2Int(ws["max-early-data"]);
                         bean->transport->early_data_header_name = Node2QString(ws["early-data-header-name"]);
+                        if (Node2Bool(ws["v2ray-http-upgrade"])) {
+                            bean->transport->type = "httpupgrade";
+                        }
                         // for Xray
                         if (Node2QString(ws["early-data-header-name"]) == "Sec-WebSocket-Protocol") {
                             bean->transport->path += "?ed=" + Node2QString(ws["max-early-data"]);
@@ -692,62 +687,41 @@ namespace Subscription {
                         bean->tls->reality->public_key = Node2QString(reality["public-key"]);
                         bean->tls->reality->short_id = Node2QString(reality["short-id"]);
                     }
-                } else if (type == "hysteria") {
+                } else if (type == "hysteria" || type == "hysteria2") {
                     auto bean = ent->Hysteria();
 
                     bean->tls->enabled = true;
                     bean->tls->insecure = Node2Bool(proxy["skip-cert-verify"]);
                     auto alpn = Node2QStringList(proxy["alpn"]);
-                    bean->tls->certificate = Node2QString(proxy["ca-str"]);
+                    bean->tls->certificate = Node2QString(proxy["ca-str"]).split("\n", Qt::SkipEmptyParts);
                     if (!alpn.isEmpty()) bean->tls->alpn = {alpn[0]};
                     bean->tls->server_name = Node2QString(proxy["sni"]);
 
-                    auto auth_str = FIRST_OR_SECOND(Node2QString(proxy["auth_str"]), Node2QString(proxy["auth-str"]));
-                    auto auth = Node2QString(proxy["auth"]);
-                    if (!auth_str.isEmpty()) {
-                        bean->auth_str = auth_str;
-                    }
-                    if (!auth.isEmpty()) {
-                        bean->auth = auth;
-                    }
-                    bean->obfs = Node2QString(proxy["obfs"]);
+                    if (type == "hysteria") {
+                        auto auth_str = FIRST_OR_SECOND(Node2QString(proxy["auth_str"]), Node2QString(proxy["auth-str"]));
+                        auto auth = Node2QString(proxy["auth"]);
+                        if (!auth_str.isEmpty()) {
+                            bean->auth_type = "STRING";
+                            bean->auth = auth_str;
+                        }
+                        if (!auth.isEmpty()) {
+                            bean->auth_type = "BASE64";
+                            bean->auth = auth;
+                        }
+                        bean->obfs = Node2QString(proxy["obfs"]);
 
-                    if (Node2Bool(proxy["disable_mtu_discovery"]) || Node2Bool(proxy["disable-mtu-discovery"])) bean->disable_mtu_discovery = true;
-                    bean->recv_window = Node2Int(proxy["recv-window"]);
-                    bean->recv_window_conn = Node2Int(proxy["recv-window-conn"]);
+                        if (Node2Bool(proxy["disable_mtu_discovery"]) || Node2Bool(proxy["disable-mtu-discovery"])) bean->disable_mtu_discovery = true;
+                        bean->recv_window = Node2Int(proxy["recv-window"]);
+                        bean->recv_window_conn = Node2Int(proxy["recv-window-conn"]);
+                    } else {
+                        bean->obfs = Node2QString(proxy["obfs-password"]);
+                        bean->password = Node2QString(proxy["password"]);
+                    }
 
                     auto upMbps = Node2QString(proxy["up"]).split(" ")[0].toInt();
                     auto downMbps = Node2QString(proxy["down"]).split(" ")[0].toInt();
                     if (upMbps > 0) bean->up_mbps = upMbps;
                     if (downMbps > 0) bean->down_mbps = downMbps;
-
-                    auto ports = Node2QString(proxy["ports"]);
-                    if (!ports.isEmpty()) {
-                        QStringList serverPorts;
-                        ports.replace("/", ",");
-                        for (const QString& port : ports.split(",", Qt::SkipEmptyParts)) {
-                            if (port.isEmpty()) {
-                                continue;
-                            }
-                            QString modifiedPort = port;
-                            modifiedPort.replace("-", ":");
-                            serverPorts.append(modifiedPort);
-                        }
-                        bean->server_ports = serverPorts;
-                    }
-                } else if (type == "hysteria2") {
-                    auto bean = ent->Hysteria2();
-
-                    bean->tls->enabled = true;
-                    bean->tls->insecure = Node2Bool(proxy["skip-cert-verify"]);
-                    bean->tls->certificate = Node2QString(proxy["ca-str"]);
-                    bean->tls->server_name = Node2QString(proxy["sni"]);
-
-                    bean->obfsPassword = Node2QString(proxy["obfs-password"]);
-                    bean->password = Node2QString(proxy["password"]);
-
-                    bean->up_mbps = Node2QString(proxy["up"]).split(" ")[0].toInt();
-                    bean->down_mbps = Node2QString(proxy["down"]).split(" ")[0].toInt();
 
                     auto ports = Node2QString(proxy["ports"]);
                     if (!ports.isEmpty()) {
@@ -781,7 +755,7 @@ namespace Subscription {
                     bean->zero_rtt_handshake = Node2Bool(proxy["reduce-rtt"]);
                     bean->tls->insecure = Node2Bool(proxy["skip-cert-verify"]);
                     bean->tls->alpn = Node2QStringList(proxy["alpn"]);
-                    bean->tls->certificate = Node2QString(proxy["ca-str"]);
+                    bean->tls->certificate = Node2QString(proxy["ca-str"]).split("\n", Qt::SkipEmptyParts);
                     bean->tls->server_name = Node2QString(proxy["sni"]);
 
                     if (Node2Bool(proxy["udp-over-stream"])) bean->udp_over_stream = true;

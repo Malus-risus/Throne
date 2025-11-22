@@ -82,10 +82,10 @@ namespace Configs
         QString max_version;
         QStringList cipher_suites;
         QStringList curve_preferences;
-        QString certificate;
+        QStringList certificate;
         QString certificate_path;
         QStringList certificate_public_key_sha256;
-        QString client_certificate;
+        QStringList client_certificate;
         QString client_certificate_path;
         QStringList client_key;
         QString client_key_path;
@@ -107,10 +107,10 @@ namespace Configs
             _add(new configItem("max_version", &max_version, string));
             _add(new configItem("cipher_suites", &cipher_suites, stringList));
             _add(new configItem("curve_preferences", &curve_preferences, stringList));
-            _add(new configItem("certificate", &certificate, string));
+            _add(new configItem("certificate", &certificate, stringList));
             _add(new configItem("certificate_path", &certificate_path, string));
             _add(new configItem("certificate_public_key_sha256", &certificate_public_key_sha256, stringList));
-            _add(new configItem("client_certificate", &client_certificate, string));
+            _add(new configItem("client_certificate", &client_certificate, stringList));
             _add(new configItem("client_certificate_path", &client_certificate_path, string));
             _add(new configItem("client_key", &client_key, stringList));
             _add(new configItem("client_key_path", &client_key_path, string));

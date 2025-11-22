@@ -110,6 +110,7 @@ namespace Configs {
     QString Transport::ExportToLink()
     {
         QUrlQuery query;
+        if (type.isEmpty() || type == "tcp") return "";
         if (!type.isEmpty()) query.addQueryItem("type", type);
         if (!host.isEmpty()) query.addQueryItem("host", host);
         if (!path.isEmpty()) query.addQueryItem("path", path);
@@ -127,6 +128,7 @@ namespace Configs {
     QJsonObject Transport::ExportToJson()
     {
         QJsonObject object;
+        if (type.isEmpty() || type == "tcp") return object;
         if (!type.isEmpty()) object["type"] = type;
         if (!host.isEmpty()) object["host"] = host;
         if (!path.isEmpty()) object["path"] = path;

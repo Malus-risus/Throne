@@ -182,6 +182,10 @@ namespace Configs {
             else if (ent->_bean->mux_state == 2) obj["multiplex"] = QJsonObject{{"enabled", false}};
             ent->outbound->ParseFromJson(obj);
             ent->outbound->name = ent->_bean->name;
+            if (ent->type == "hysteria2") {
+                ent->type = "hysteria";
+                ent->Hysteria()->protocol_version = "2";
+            }
         }
     }
 
@@ -253,12 +257,9 @@ namespace Configs {
         } else if (type == "vless") {
             bean = new Configs::TrojanVLESSBean(Configs::TrojanVLESSBean::proxy_VLESS);
             outbound = new Configs::vless();
-        } else if (type == "hysteria") {
-            bean = new Configs::QUICBean(Configs::QUICBean::proxy_Hysteria);
+        } else if (type == "hysteria" || type == "hysteria2") {
+            bean = new Configs::QUICBean(type == "hysteria" ? Configs::QUICBean::proxy_Hysteria : Configs::QUICBean::proxy_Hysteria2);
             outbound = new Configs::hysteria();
-        } else if (type == "hysteria2") {
-            bean = new Configs::QUICBean(Configs::QUICBean::proxy_Hysteria2);
-            outbound = new Configs::hysteria2();
         } else if (type == "tuic") {
             bean = new Configs::QUICBean(Configs::QUICBean::proxy_TUIC);
             outbound = new Configs::tuic();

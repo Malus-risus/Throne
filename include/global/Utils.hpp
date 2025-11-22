@@ -92,6 +92,8 @@ QList<int> QJsonArray2QListInt(const QJsonArray &arr);
 
 QJsonObject QMapString2QJsonObject(const QMap<QString,QString> &mp);
 
+QList<QString> QListInt2QListString(const QList<int> &list);
+
 #define QJSONARRAY_ADD(arr, add) \
     for (const auto &a: (add)) { \
         (arr) += a;              \

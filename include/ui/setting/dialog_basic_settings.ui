@@ -418,8 +418,8 @@
         <layout class="QHBoxLayout" name="style_h_1">
          <item>
           <widget class="QGroupBox" name="groupBox">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0">
              <widget class="QLabel" name="label_8">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -432,13 +432,27 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="1">
              <widget class="QComboBox" name="theme">
               <item>
                <property name="text">
                 <string notr="true">System</string>
                </property>
               </item>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="select_custom_icon">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="enable_custom_icon">
+              <property name="text">
+               <string>Enable Custom Icons</string>
+              </property>
              </widget>
             </item>
            </layout>

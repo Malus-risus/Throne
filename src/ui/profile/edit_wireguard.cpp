@@ -19,8 +19,7 @@ void EditWireguard::onStart(std::shared_ptr<Configs::ProxyEntity> _ent) {
     ui->private_key->setText(outbound->private_key);
     ui->public_key->setText(outbound->peer->public_key);
     ui->preshared_key->setText(outbound->peer->pre_shared_key);
-    // auto reservedStr = outbound->peer->reserved;
-    // ui->reserved->setText(reservedStr);
+    ui->reserved->setText(QListInt2QListString(outbound->peer->reserved).join(","));
     ui->persistent_keepalive->setText(Int2String(outbound->peer->persistent_keepalive));
     ui->mtu->setText(Int2String(outbound->mtu));
     ui->sys_ifc->setChecked(outbound->system);
@@ -46,11 +45,11 @@ bool EditWireguard::onEnd() {
     outbound->peer->public_key = ui->public_key->text();
     outbound->peer->pre_shared_key = ui->preshared_key->text();
     auto rawReserved = ui->reserved->text();
-    // outbound->reserved = {};
-    // for (const auto& item: rawReserved.split(",")) {
-    //     if (item.trimmed().isEmpty()) continue;
-    //     outbound->reserved += item.trimmed().toInt();
-    // }
+    outbound->peer->reserved = {};
+    for (const auto& item: rawReserved.split(",")) {
+        if (item.trimmed().isEmpty()) continue;
+        outbound->peer->reserved += item.trimmed().toInt();
+    }
     outbound->peer->persistent_keepalive = ui->persistent_keepalive->text().toInt();
     outbound->mtu = ui->mtu->text().toInt();
     outbound->system = ui->sys_ifc->isChecked();

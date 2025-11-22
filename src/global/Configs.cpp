@@ -324,6 +324,7 @@ namespace Configs {
         _add(new configItem("url_test_timeout_ms", &url_test_timeout_ms, itemType::integer));
         _add(new configItem("show_system_dns", &show_system_dns, itemType::boolean));
         _add(new configItem("main_window_geometry", &mainWindowGeometry, itemType::string));
+        _add(new configItem("use_custom_icons", &use_custom_icons, itemType::boolean));
     }
 
     void DataStore::UpdateStartedId(int id) {

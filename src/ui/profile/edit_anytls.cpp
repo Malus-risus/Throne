@@ -6,8 +6,6 @@
 
 EditAnyTLS::EditAnyTLS(QWidget *parent) : QWidget(parent), ui(new Ui::EditAnyTLS) {
     ui->setupUi(this);
-    ui->interval->setValidator(QRegExpValidator_Number);
-    ui->timeout->setValidator(QRegExpValidator_Number);
     ui->min->setValidator(QRegExpValidator_Number);
 }
 

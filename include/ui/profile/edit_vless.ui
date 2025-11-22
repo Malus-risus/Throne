@@ -22,13 +22,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QComboBox" name="flow">
-     <item>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-     </item>
-    </widget>
+    <widget class="QComboBox" name="flow"/>
    </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">

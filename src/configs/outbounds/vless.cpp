@@ -25,7 +25,7 @@ namespace Configs {
             tls->enabled = true;
         }
         
-        packet_encoding = GetQueryValue(query, "packetEncoding", "");
+        packet_encoding = GetQueryValue(query, "packetEncoding", "xudp");
         multiplex->ParseFromLink(link);
 
         return !(uuid.isEmpty() || server.isEmpty());

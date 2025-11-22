@@ -158,9 +158,6 @@ set(PROJECT_SOURCES
         include/ui/profile/edit_hysteria.h
         src/ui/profile/edit_hysteria.cpp
         include/ui/profile/edit_hysteria.ui
-        include/ui/profile/edit_hysteria2.h
-        src/ui/profile/edit_hysteria2.cpp
-        include/ui/profile/edit_hysteria2.ui
         include/ui/profile/edit_tuic.h
         src/ui/profile/edit_tuic.cpp
         include/ui/profile/edit_tuic.ui
@@ -252,7 +249,6 @@ set(PROJECT_SOURCES
         include/configs/outbounds/hysteria.h
         include/configs/outbounds/vless.h
         include/configs/outbounds/tuic.h
-        include/configs/outbounds/hysteria2.h
         include/configs/outbounds/anyTLS.h
         include/configs/outbounds/ssh.h
         
@@ -260,7 +256,6 @@ set(PROJECT_SOURCES
         src/configs/outbounds/anyTLS.cpp
         src/configs/outbounds/http.cpp
         src/configs/outbounds/hysteria.cpp
-        src/configs/outbounds/hysteria2.cpp
         src/configs/outbounds/shadowsocks.cpp
         src/configs/outbounds/socks.cpp
         src/configs/outbounds/ssh.cpp
@@ -292,9 +287,9 @@ set(PROJECT_SOURCES
         include/ui/profile/edit_tuic.h
         src/ui/profile/edit_tuic.cpp
         include/ui/profile/edit_tuic.ui
-        include/ui/profile/edit_hysteria2.h
-        src/ui/profile/edit_hysteria2.cpp
-        include/ui/profile/edit_hysteria2.ui
+        include/ui/profile/edit_advanced.h
+        src/ui/profile/edit_advanced.cpp
+        include/ui/profile/edit_advanced.ui
 )
 
 if (NOT APPLE AND Qt6_VERSION VERSION_GREATER_EQUAL 6.9.0)

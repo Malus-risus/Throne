@@ -169,10 +169,10 @@ namespace Configs {
         if (query.hasQueryItem("tls_max_version")) max_version = query.queryItemValue("tls_max_version");
         if (query.hasQueryItem("tls_cipher_suites")) cipher_suites = query.queryItemValue("tls_cipher_suites").split(",");
         if (query.hasQueryItem("tls_curve_preferences")) curve_preferences = query.queryItemValue("tls_curve_preferences").split(",");
-        if (query.hasQueryItem("tls_certificate")) certificate = query.queryItemValue("tls_certificate");
+        if (query.hasQueryItem("tls_certificate")) certificate = query.queryItemValue("tls_certificate").split(",");
         if (query.hasQueryItem("tls_certificate_path")) certificate_path = query.queryItemValue("tls_certificate_path");
         if (query.hasQueryItem("tls_certificate_public_key_sha256")) certificate_public_key_sha256 = query.queryItemValue("tls_certificate_public_key_sha256").split(",");
-        if (query.hasQueryItem("tls_client_certificate")) client_certificate = query.queryItemValue("tls_client_certificate");
+        if (query.hasQueryItem("tls_client_certificate")) client_certificate = query.queryItemValue("tls_client_certificate").split(",");
         if (query.hasQueryItem("tls_client_certificate_path")) client_certificate_path = query.queryItemValue("tls_client_certificate_path");
         if (query.hasQueryItem("tls_client_key")) client_key = query.queryItemValue("tls_client_key").split(",");
         if (query.hasQueryItem("tls_client_key_path")) client_key_path = query.queryItemValue("tls_client_key_path");
@@ -203,12 +203,20 @@ namespace Configs {
         if (object.contains("curve_preferences")) {
             curve_preferences = QJsonArray2QListString(object["curve_preferences"].toArray());
         }
-        if (object.contains("certificate")) certificate = object["certificate"].toString();
+        if (object.contains("certificate")) {
+            if (object["certificate"].isString()) {
+                certificate = object["certificate"].toString().split("\n", Qt::SkipEmptyParts);
+            } else {
+                certificate = QJsonArray2QListString(object["certificate"].toArray());
+            }
+        }
         if (object.contains("certificate_path")) certificate_path = object["certificate_path"].toString();
         if (object.contains("certificate_public_key_sha256")) {
             certificate_public_key_sha256 = QJsonArray2QListString(object["certificate_public_key_sha256"].toArray());
         }
-        if (object.contains("client_certificate")) client_certificate = object["client_certificate"].toString();
+        if (object.contains("client_certificate")) {
+            client_certificate = QJsonArray2QListString(object["client_certificate"].toArray());
+        }
         if (object.contains("client_certificate_path")) client_certificate_path = object["client_certificate_path"].toString();
         if (object.contains("client_key")) {
             client_key = QJsonArray2QListString(object["client_key"].toArray());
@@ -235,10 +243,10 @@ namespace Configs {
         if (!max_version.isEmpty()) query.addQueryItem("tls_max_version", max_version);
         if (!cipher_suites.isEmpty()) query.addQueryItem("tls_cipher_suites", cipher_suites.join(","));
         if (!curve_preferences.isEmpty()) query.addQueryItem("tls_curve_preferences", curve_preferences.join(","));
-        if (!certificate.isEmpty()) query.addQueryItem("tls_certificate", certificate);
+        if (!certificate.isEmpty()) query.addQueryItem("tls_certificate", certificate.join(","));
         if (!certificate_path.isEmpty()) query.addQueryItem("tls_certificate_path", certificate_path);
         if (!certificate_public_key_sha256.isEmpty()) query.addQueryItem("tls_certificate_public_key_sha256", certificate_public_key_sha256.join(","));
-        if (!client_certificate.isEmpty()) query.addQueryItem("tls_client_certificate", client_certificate);
+        if (!client_certificate.isEmpty()) query.addQueryItem("tls_client_certificate", client_certificate.join(","));
         if (!client_certificate_path.isEmpty()) query.addQueryItem("tls_client_certificate_path", client_certificate_path);
         if (!client_key.isEmpty()) query.addQueryItem("tls_client_key", client_key.join(","));
         if (!client_key_path.isEmpty()) query.addQueryItem("tls_client_key_path", client_key_path);
@@ -269,12 +277,14 @@ namespace Configs {
         if (!curve_preferences.isEmpty()) {
             object["curve_preferences"] = QListStr2QJsonArray(curve_preferences);
         }
-        if (!certificate.isEmpty()) object["certificate"] = certificate;
+        if (!certificate.isEmpty()) {
+            object["certificate"] = QListStr2QJsonArray(certificate);
+        }
         if (!certificate_path.isEmpty()) object["certificate_path"] = certificate_path;
         if (!certificate_public_key_sha256.isEmpty()) {
             object["certificate_public_key_sha256"] = QListStr2QJsonArray(certificate_public_key_sha256);
         }
-        if (!client_certificate.isEmpty()) object["client_certificate"] = client_certificate;
+        if (!client_certificate.isEmpty()) object["client_certificate"] = QListStr2QJsonArray(client_certificate);
         if (!client_certificate_path.isEmpty()) object["client_certificate_path"] = client_certificate_path;
         if (!client_key.isEmpty()) {
             object["client_key"] = QListStr2QJsonArray(client_key);
