@@ -8,34 +8,29 @@
 namespace Configs {
     bool shadowsocks::ParseFromLink(const QString& link)
     {
-        auto url = QUrl(link);
-        if (!url.isValid()) return false;
-        auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
-
-        outbound::ParseFromLink(link);
-
+        QUrl url;
         if (SubStrBefore(link, "#").contains("@")) {
-            // Traditional SS format
-            if (url.password().isEmpty()) {
-                // Traditional format: method:password base64 encoded in username
-                auto method_password = DecodeB64IfValid(url.userName(), QByteArray::Base64Option::Base64UrlEncoding);
-                if (method_password.isEmpty()) return false;
-                method = SubStrBefore(method_password, ":");
-                password = SubStrAfter(method_password, ":");
-            } else {
-                // 2022 format: method in username, password in password
-                method = url.userName();
-                password = url.password();
-            }
+            url = QUrl(link);
         } else {
             // v2rayN format: base64 encoded full URL
             QString linkN = DecodeB64IfValid(SubStrBefore(SubStrAfter(link, "://"), "#"), QByteArray::Base64Option::Base64UrlEncoding);
             if (linkN.isEmpty()) return false;
             if (link.contains("#")) linkN += "#" + SubStrAfter(link, "#");
             url = QUrl("https://" + linkN);
-            if (!url.isValid()) return false;
-            query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
-            outbound::ParseFromLink(url.toString());
+        }
+        if (!url.isValid()) return false;
+        auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
+        outbound::ParseFromLink(url.toString());
+
+        // Traditional SS format
+        if (url.password().isEmpty()) {
+            // Traditional format: method:password base64 encoded in username
+            auto method_password = DecodeB64IfValid(url.userName(), QByteArray::Base64Option::Base64UrlEncoding);
+            if (method_password.isEmpty()) return false;
+            method = SubStrBefore(method_password, ":");
+            password = SubStrAfter(method_password, ":");
+        } else {
+            // 2022 format: method in username, password in password
             method = url.userName();
             password = url.password();
         }
