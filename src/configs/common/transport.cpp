@@ -82,8 +82,10 @@ namespace Configs {
         if (query.hasQueryItem("max_early_data")) max_early_data = query.queryItemValue("max_early_data").toInt();
         if (query.hasQueryItem("early_data_header_name")) early_data_header_name = query.queryItemValue("early_data_header_name");
         if (query.hasQueryItem("serviceName")) service_name = query.queryItemValue("serviceName");
-        if (query.hasQueryItem("mode")) xhttp_mode = query.queryItemValue("mode");
-        if (query.hasQueryItem("extra")) xhttp_extra = query.queryItemValue("extra");
+        if (type == "xhttp") {
+            if (query.hasQueryItem("mode")) xhttp_mode = query.queryItemValue("mode");
+            if (query.hasQueryItem("extra")) xhttp_extra = query.queryItemValue("extra");
+        }
         return true;
     }
     bool Transport::ParseFromJson(const QJsonObject& object)
@@ -101,7 +103,7 @@ namespace Configs {
         if (object.contains("max_early_data")) max_early_data = object["max_early_data"].toInt();
         if (object.contains("early_data_header_name")) early_data_header_name = object["early_data_header_name"].toString();
         if (object.contains("service_name")) service_name = object["service_name"].toString();
-        if (object.contains("mode")) {
+        if (type == "xhttp" && object.contains("mode")) {
             xhttp_mode = object["mode"].toString();
             xhttp_extra = XhttpExtraConverter::singBoxToXray(object);
         }
