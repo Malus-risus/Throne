@@ -36,6 +36,8 @@ namespace Configs {
         }
 
         plugin = query.queryItemValue("plugin").replace("simple-obfs;", "obfs-local;");
+        plugin_opts = SubStrAfter(plugin, ";");
+        plugin = SubStrBefore(plugin, ";");
         if (query.hasQueryItem("plugin-opts")) plugin_opts = query.queryItemValue("plugin-opts");
         if (query.hasQueryItem("uot")) uot = query.queryItemValue("uot") == "true" || query.queryItemValue("uot").toInt() > 0;
         multiplex->ParseFromLink(link);
