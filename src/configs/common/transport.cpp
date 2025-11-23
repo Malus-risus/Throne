@@ -73,17 +73,10 @@ namespace Configs {
                 method = "GET";
             }
         }
-        if (query.hasQueryItem("host")) {
-            host = query.queryItemValue("host");
-            if (type == "ws") headers << "host" << host;
-        }
+        if (query.hasQueryItem("host")) host = query.queryItemValue("host");
         if (query.hasQueryItem("path")) path = query.queryItemValue("path");
         if (query.hasQueryItem("method")) method = query.queryItemValue("method");
-        if (query.hasQueryItem("headers")) {
-            auto headersImported = query.queryItemValue("headers").split(",");
-            if (headersImported.contains("host")) headers = headersImported;
-            else headers << headersImported;
-        }
+        if (query.hasQueryItem("headers")) headers = query.queryItemValue("headers").split(",");
         if (query.hasQueryItem("idle_timeout")) idle_timeout = query.queryItemValue("idle_timeout");
         if (query.hasQueryItem("ping_timeout")) ping_timeout = query.queryItemValue("ping_timeout");
         if (query.hasQueryItem("max_early_data")) max_early_data = query.queryItemValue("max_early_data").toInt();
@@ -137,11 +130,18 @@ namespace Configs {
         QJsonObject object;
         if (type.isEmpty() || type == "tcp") return object;
         if (!type.isEmpty()) object["type"] = type;
-        if (!host.isEmpty() && (type == "http" || type == "httpupgrade")) object["host"] = host;
         if (!path.isEmpty()) object["path"] = path;
         if (!method.isEmpty()) object["method"] = method;
         if (!headers.isEmpty()) {
             object["headers"] = qStringListToJsonObject(headers);
+        }
+        if (!host.isEmpty()) {
+            if (type == "http" || type == "httpupgrade") object["host"] = host;
+            if (type == "ws") {
+                auto headersObj = object["headers"].isObject() ? object["headers"].toObject() : QJsonObject();
+                headersObj["host"] = host;
+                object["headers"] = headersObj;
+            }
         }
         if (!idle_timeout.isEmpty()) object["idle_timeout"] = idle_timeout;
         if (!ping_timeout.isEmpty()) object["ping_timeout"] = ping_timeout;
