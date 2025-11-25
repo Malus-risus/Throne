@@ -96,7 +96,12 @@ namespace Configs {
         if (object.contains("path")) path = object["path"].toString();
         if (object.contains("method")) method = object["method"].toString();
         if (object.contains("headers") && object["headers"].isObject()) {
-            headers = jsonObjectToQStringList(object["headers"].toObject());
+            auto headerObj = object["headers"].toObject();
+            if (type == "ws") {
+                if (headerObj.contains("Host")) host = headerObj["Host"].toString();
+                headerObj.remove("Host");
+            }
+            headers = jsonObjectToQStringList(headerObj);
         }
         if (object.contains("idle_timeout")) idle_timeout = object["idle_timeout"].toString();
         if (object.contains("ping_timeout")) ping_timeout = object["ping_timeout"].toString();
@@ -144,7 +149,7 @@ namespace Configs {
             if (type == "http" || type == "httpupgrade") object["host"] = host;
             if (type == "ws") {
                 auto headersObj = object["headers"].isObject() ? object["headers"].toObject() : QJsonObject();
-                headersObj["host"] = host;
+                headersObj["Host"] = host;
                 object["headers"] = headersObj;
             }
         }
