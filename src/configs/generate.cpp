@@ -729,6 +729,7 @@ namespace Configs {
         route["rules"] = routeRules;
         route["rule_set"] = ruleSetArray;
         route["final"] = outboundIDToString(routeChain->defaultOutboundID);
+        if (dataStore->enable_stats)  route["find_process"] = true;
         route["default_domain_resolver"] = QJsonObject{
                                 {"server", "dns-direct"},
                                 {"strategy", dataStore->routing->outbound_domain_strategy}};
