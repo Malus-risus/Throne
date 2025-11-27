@@ -342,7 +342,8 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         auto mux = ent->outbound->GetMux();
         ui->multiplex->setCurrentIndex(mux->getMuxState());
         ui->brutal_enable->setChecked(mux->brutal->enabled);
-        ui->brutal_speed->setText(Int2String(mux->brutal->down_mbps));
+        ui->brutal_d_speed->setText(Int2String(mux->brutal->down_mbps));
+        ui->brutal_u_speed->setText(Int2String(mux->brutal->up_mbps));
     }
 
     // 左边 bean
@@ -457,7 +458,8 @@ bool DialogEditProfile::onEnd() {
         auto mux = ent->outbound->GetMux();
         mux->saveMuxState(ui->multiplex->currentIndex());
         mux->brutal->enabled = ui->brutal_enable->isChecked();
-        mux->brutal->down_mbps = ui->brutal_speed->text().toInt();
+        mux->brutal->down_mbps = ui->brutal_d_speed->text().toInt();
+        mux->brutal->up_mbps = ui->brutal_u_speed->text().toInt();
     }
 
     return true;
