@@ -19,11 +19,8 @@ void EditShadowSocks::onStart(std::shared_ptr<Configs::ProxyEntity> _ent) {
     ui->method->setCurrentText(outbound->method);
     ui->uot->setCurrentIndex(outbound->uot);
     ui->password->setText(outbound->password);
-    auto ssPlugin = outbound->plugin.split(";");
-    if (!ssPlugin.empty()) {
-        ui->plugin->setCurrentText(ssPlugin[0]);
-        ui->plugin_opts->setText(SubStrAfter(outbound->plugin, ";"));
-    }
+    ui->plugin->setCurrentText(outbound->plugin);
+    ui->plugin_opts->setText(outbound->plugin_opts);
 }
 
 bool EditShadowSocks::onEnd() {
@@ -33,9 +30,7 @@ bool EditShadowSocks::onEnd() {
     outbound->password = ui->password->text();
     outbound->uot = ui->uot->currentIndex();
     outbound->plugin = ui->plugin->currentText();
-    if (!outbound->plugin.isEmpty()) {
-        outbound->plugin += ";" + ui->plugin_opts->text();
-    }
+    outbound->plugin_opts = ui->plugin_opts->text();
 
     return true;
 }
