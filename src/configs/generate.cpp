@@ -620,7 +620,7 @@ namespace Configs {
                 ctx->error = "Ent is nullptr after cast to chain, data is corrupted";
                 return;
             }
-            entIDs << chain->list;
+            for (int idx = chain->list.size()-1; idx >=0; idx--) entIDs.append(chain->list[idx]);
         } else
         {
             entIDs.append(ctx->ent->id);
