@@ -970,7 +970,6 @@ void MainWindow::prepare_exit()
         return;
     }
     hide();
-    // tray->hide();
     Configs::dataStore->prepare_exit = true;
     //
     RegisterHiddenMenuShortcuts(true);

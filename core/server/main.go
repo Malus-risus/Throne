@@ -64,6 +64,13 @@ func RunCore() {
 }
 
 func main() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Core panicked:")
+			fmt.Println(err)
+			os.Exit(0)
+		}
+	}()
 	fmt.Println("sing-box:", C.Version)
 	fmt.Println()
 	runtimeDebug.SetMemoryLimit(2 * 1024 * 1024 * 1024) // 2GB
