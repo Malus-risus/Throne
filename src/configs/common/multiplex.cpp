@@ -35,8 +35,9 @@ namespace Configs {
         QJsonObject object;
         if (!enabled) return object;
         object["enabled"] = enabled;
-        if (up_mbps > 0) object["up_mbps"] = up_mbps;
-        if (down_mbps > 0) object["down_mbps"] = down_mbps;
+        // sing-box expects both values it seems
+        object["up_mbps"] = up_mbps <= 0 ? 1 : up_mbps;
+        object["down_mbps"] = down_mbps <= 0 ? 1 : down_mbps;
         return object;
     }
     BuildResult TcpBrutal::Build()
