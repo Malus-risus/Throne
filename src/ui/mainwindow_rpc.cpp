@@ -512,7 +512,7 @@ void MainWindow::profile_start(int _id) {
 
                     int r = msg.exec() - 2;
                     if (r == 0) {
-                        GetMainWindow()->StopVPNProcess();
+                        StopVPNProcess();
                     }
                 });
                 return false;

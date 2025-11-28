@@ -2500,15 +2500,10 @@ void MainWindow::HotkeyEvent(const QString &key) {
 }
 
 bool MainWindow::StopVPNProcess() {
-    QMutex waitStop;
-    waitStop.lock();
-    runOnThread([=, this, &waitStop]
+    runOnThread([=, this]
     {
         core_process->Kill();
-        waitStop.unlock();
-    }, DS_cores);
-    waitStop.lock();
-    waitStop.unlock();
+    }, DS_cores, true);
 
     return true;
 }
