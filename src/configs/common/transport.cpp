@@ -128,8 +128,8 @@ namespace Configs {
         if (max_early_data > 0) query.addQueryItem("max_early_data", QString::number(max_early_data));
         if (!early_data_header_name.isEmpty()) query.addQueryItem("early_data_header_name", early_data_header_name);
         if (!service_name.isEmpty()) query.addQueryItem("serviceName", service_name);
-        if (!xhttp_mode.isEmpty()) query.addQueryItem("mode", xhttp_mode);
-        if (!xhttp_extra.isEmpty()) query.addQueryItem("extra", xhttp_extra);
+        if (!xhttp_mode.isEmpty() && type == "xhttp") query.addQueryItem("mode", xhttp_mode);
+        if (!xhttp_extra.isEmpty() && type == "xhttp") query.addQueryItem("extra", xhttp_extra);
         return query.toString();
     }
     QJsonObject Transport::ExportToJson()
@@ -158,8 +158,8 @@ namespace Configs {
         if (max_early_data > 0) object["max_early_data"] = max_early_data;
         if (!early_data_header_name.isEmpty()) object["early_data_header_name"] = early_data_header_name;
         if (!service_name.isEmpty()) object["service_name"] = service_name;
-        if (!xhttp_mode.isEmpty()) object["mode"] = xhttp_mode;
-        if (!xhttp_extra.isEmpty()) mergeJsonObjects(object, XhttpExtraConverter::xrayToSingBox(xhttp_extra));
+        if (!xhttp_mode.isEmpty() && type == "xhttp") object["mode"] = xhttp_mode;
+        if (!xhttp_extra.isEmpty() && type == "xhttp") mergeJsonObjects(object, XhttpExtraConverter::xrayToSingBox(xhttp_extra));
         return object;
     }
     BuildResult Transport::Build()
