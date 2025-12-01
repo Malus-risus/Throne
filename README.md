@@ -50,9 +50,9 @@ Various formats are supported, including share links, JSON array of outbounds an
 - [Qv2ray](https://github.com/Qv2ray/Qv2ray)
 - [Qt](https://www.qt.io/)
 - [simple-protobuf](https://github.com/tonda-kriz/simple-protobuf)
-- [fkYAML](https://github.com/fktn-k/fkYAML)
 - [quirc](https://github.com/dlbeer/quirc)
 - [QHotkey](https://github.com/Skycoder42/QHotkey)
+- [clash2singbox](https://github.com/xmdhs/clash2singbox)
 
 ## FAQ
 **How does this project differ from the original Nekoray?** <br/>

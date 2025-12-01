@@ -5,8 +5,6 @@
 namespace Subscription {
     class RawUpdater {
     public:
-        void updateClash(const QString &str);
-
         void update(const QString &str, bool needParse);
 
         void updateSingBox(const QString &str);

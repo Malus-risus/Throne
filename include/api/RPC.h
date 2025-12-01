@@ -39,6 +39,8 @@ namespace API {
 
         libcore::QueryCountryTestResponse QueryCountryTestResults(bool *rpcOK);
 
+        QString Clash2Singbox(bool *rpcOK, const QString& config) const;
+
     private:
         std::function<std::unique_ptr<protorpc::Client>()> make_rpc_client;
         std::function<void(const QString &)> onError;

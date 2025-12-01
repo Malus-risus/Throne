@@ -21,6 +21,11 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"encoding/json"
+	"github.com/xmdhs/clash2singbox/convert"
+	"github.com/xmdhs/clash2singbox/model"
+	"github.com/xmdhs/clash2singbox/model/clash"
+	"gopkg.in/yaml.v3"
 )
 
 var boxInstance *boxbox.Box
@@ -402,4 +407,30 @@ func (s *server) QueryCountryTest(in *gen.EmptyReq, out *gen.QueryCountryTestRes
 		})
 	}
 	return nil
+}
+
+func (s *server) Clash2Singbox(in *gen.Clash2SingboxRequest, out *gen.Clash2SingboxResponse) (_ error) {
+	var convErr error
+
+	defer func() {
+		if convErr != nil {
+			out.Error = To(convErr.Error())
+		}
+	}()
+
+	c := clash.Clash{}
+	err := yaml.Unmarshal([]byte(*in.ClashConfig), &c)
+	if err != nil {
+		return
+	}
+
+	sing, convErr := convert.Clash2sing(c, model.SINGLATEST)
+
+	outb, err := json.Marshal(map[string]any{"outbounds": sing})
+	if err != nil {
+		return
+	}
+
+	out.SingboxConfig = To(string(outb))
+	return
 }

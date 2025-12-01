@@ -15,13 +15,17 @@ require (
 	github.com/sagernet/sing-box v1.12.12
 	github.com/sagernet/sing-tun v0.7.3
 	github.com/spf13/cobra v1.10.1
+	github.com/xmdhs/clash2singbox v0.1.5-0.20251129070952-d3d41337d2c1
 	golang.org/x/sys v0.37.0
 	google.golang.org/protobuf v1.36.10
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 replace github.com/sagernet/sing-box => github.com/throneproj/sing-box v1.11.16-0.20251130042527-87761cb617d3
 
 replace github.com/sagernet/wireguard-go => github.com/throneproj/wireguard-go v0.0.1-beta.7.0.20250728063157-408bba78ad26
+
+replace github.com/xmdhs/clash2singbox => github.com/throneproj/clash2singbox v0.1.5-0.20251130124907-02ead6993794
 
 replace github.com/chai2010/protorpc => ../protorpc
 

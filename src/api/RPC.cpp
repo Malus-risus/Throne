@@ -240,4 +240,27 @@ if (!Configs::dataStore->core_running) MW_show_log("Cannot invoke method " + QSt
         }
     }
 
+    QString Client::Clash2Singbox(bool* rpcOK, const QString& config) const
+    {
+        CHECK("Clash2Singbox")
+        libcore::Clash2SingboxRequest request;
+        libcore::Clash2SingboxResponse reply;
+        request.clash_config = config.toStdString();
+        std::string resp, req = spb::pb::serialize<std::string>(request);
+        auto err = make_rpc_client()->CallMethod("LibcoreService.Clash2Singbox", &req, &resp);
+
+        if(err.IsNil()) {
+            reply = spb::pb::deserialize< libcore::Clash2SingboxResponse >( resp );
+            *rpcOK = true;
+            QString error = QString::fromStdString(reply.error.value());
+            if (!error.isEmpty()) {
+                MW_show_log(QString("Failed to convert Clash config:\n") + error);
+            }
+            return QString::fromStdString(reply.singbox_config.value());
+        } else {
+            NOT_OK
+            return "";
+        }
+    }
+
 } // namespace API
