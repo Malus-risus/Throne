@@ -42,7 +42,7 @@ namespace Configs {
     BuildResult uTLS::Build()
     {
         auto obj = ExportToJson();
-        if ((obj.isEmpty() || obj["enabled"].toBool() == false) && !dataStore->utlsFingerprint.isEmpty()) {
+        if ((obj.isEmpty() || obj["enabled"].toBool() == false || fingerPrint.isEmpty()) && !dataStore->utlsFingerprint.isEmpty()) {
             obj["enabled"] = true;
             obj["fingerprint"] = dataStore->utlsFingerprint;
         }
@@ -301,11 +301,43 @@ namespace Configs {
     }
     BuildResult TLS::Build()
     {
-        auto obj = ExportToJson();
-        if (!obj.isEmpty() && obj["enabled"].toBool()) {
-            if (dataStore->skip_cert) obj["insecure"] = true;
+        QJsonObject object;
+        if (!enabled) return {};
+        object["enabled"] = enabled;
+        if (disable_sni) object["disable_sni"] = disable_sni;
+        if (!server_name.isEmpty()) object["server_name"] = server_name;
+        if (insecure) object["insecure"] = insecure;
+        if (!alpn.isEmpty()) {
+            object["alpn"] = QListStr2QJsonArray(alpn);
         }
-        return {ExportToJson(), ""};
+        if (!min_version.isEmpty()) object["min_version"] = min_version;
+        if (!max_version.isEmpty()) object["max_version"] = max_version;
+        if (!cipher_suites.isEmpty()) {
+            object["cipher_suites"] = QListStr2QJsonArray(cipher_suites);
+        }
+        if (!curve_preferences.isEmpty()) {
+            object["curve_preferences"] = QListStr2QJsonArray(curve_preferences);
+        }
+        if (!certificate.isEmpty()) {
+            object["certificate"] = QListStr2QJsonArray(certificate);
+        }
+        if (!certificate_path.isEmpty()) object["certificate_path"] = certificate_path;
+        if (!certificate_public_key_sha256.isEmpty()) {
+            object["certificate_public_key_sha256"] = QListStr2QJsonArray(certificate_public_key_sha256);
+        }
+        if (!client_certificate.isEmpty()) object["client_certificate"] = QListStr2QJsonArray(client_certificate);
+        if (!client_certificate_path.isEmpty()) object["client_certificate_path"] = client_certificate_path;
+        if (!client_key.isEmpty()) {
+            object["client_key"] = QListStr2QJsonArray(client_key);
+        }
+        if (!client_key_path.isEmpty()) object["client_key_path"] = client_key_path;
+        if (fragment) object["fragment"] = fragment;
+        if (!fragment_fallback_delay.isEmpty()) object["fragment_fallback_delay"] = fragment_fallback_delay;
+        if (record_fragment) object["record_fragment"] = record_fragment;
+        if (ech->enabled) object["ech"] = ech->Build().object;
+        if (utls->enabled) object["utls"] = utls->Build().object;
+        if (reality->enabled) object["reality"] = reality->Build().object;
+        return {object, ""};
     }
 }
 
