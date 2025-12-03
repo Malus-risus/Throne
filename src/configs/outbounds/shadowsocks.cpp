@@ -62,6 +62,24 @@ namespace Configs {
         return true;
     }
 
+    bool shadowsocks::ParseFromSIP008(const QJsonObject& object)
+    {
+        if (object.isEmpty()) return false;
+        outbound::ParseFromJson(object);
+        if (object.contains("remarks")) name = object["remarks"].toString();
+        if (object.contains("method")) method = object["method"].toString();
+        if (object.contains("password")) password = object["password"].toString();
+        if (object.contains("plugin")) plugin = object["plugin"].toString().replace("simple-obfs", "obfs-local");
+        if (object.contains("plugin_opts")) plugin_opts = object["plugin_opts"].toString();
+        if (object.contains("uot"))
+        {
+            if (object["uot"].isBool()) uot = object["uot"].toBool();
+            if (object["uot"].isObject()) uot = object["uot"].toObject()["enabled"].toBool();
+        }
+        if (object.contains("multiplex")) multiplex->ParseFromJson(object["multiplex"].toObject());
+        return !(server.isEmpty() || method.isEmpty() || password.isEmpty());
+    }
+
     QString shadowsocks::ExportToLink()
     {
         QUrl url;
@@ -109,6 +127,10 @@ namespace Configs {
 
     BuildResult shadowsocks::Build()
     {
+        if (plugin.contains(";")) {
+            plugin_opts = SubStrAfter(plugin, ";");
+            plugin = SubStrBefore(plugin, ";");
+        }
         QJsonObject object;
         object["type"] = "shadowsocks";
         mergeJsonObjects(object, outbound::Build().object);

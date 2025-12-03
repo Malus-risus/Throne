@@ -63,7 +63,6 @@ namespace Configs
     class BuildPrerequisities
     {
         public:
-        std::shared_ptr<ExtraCoreData> extraCoreData = std::make_shared<ExtraCoreData>();
         std::shared_ptr<DNSDeps> dnsDeps = std::make_shared<DNSDeps>();
         std::shared_ptr<HijackDeps> hijackDeps = std::make_shared<HijackDeps>();
         std::shared_ptr<TunDeps> tunDeps = std::make_shared<TunDeps>();
@@ -74,7 +73,7 @@ namespace Configs
     public:
         QString error;
         QJsonObject coreConfig;
-        std::shared_ptr<ExtraCoreData> extraCoreData;
+        std::shared_ptr<ExtraCoreData> extraCoreData = std::make_shared<ExtraCoreData>();
 
         QList<std::shared_ptr<Stats::TrafficData>> outboundStats;
     };

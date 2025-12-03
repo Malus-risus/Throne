@@ -452,6 +452,7 @@ bool DialogEditProfile::onEnd() {
         transport->xhttp_extra = ui->xhttp_extra->text();
         tls->reality->public_key = ui->reality_pbk->text();
         tls->reality->short_id = ui->reality_sid->text();
+        tls->reality->enabled = !tls->reality->public_key.isEmpty();
         tls->certificate = CACHE.certificate;
     }
     if (ent->outbound->HasMux()) {

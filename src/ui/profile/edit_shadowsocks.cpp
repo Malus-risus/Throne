@@ -16,6 +16,10 @@ void EditShadowSocks::onStart(std::shared_ptr<Configs::ProxyEntity> _ent) {
     this->ent = _ent;
     auto outbound = this->ent->ShadowSocks();
 
+    if (outbound->plugin.contains(";")) {
+        outbound->plugin_opts = SubStrAfter(outbound->plugin, ";");
+        outbound->plugin = SubStrBefore(outbound->plugin, ";");
+    }
     ui->method->setCurrentText(outbound->method);
     ui->uot->setCurrentIndex(outbound->uot);
     ui->password->setText(outbound->password);

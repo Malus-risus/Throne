@@ -46,7 +46,7 @@ namespace Configs {
             obj["enabled"] = true;
             obj["fingerprint"] = dataStore->utlsFingerprint;
         }
-        return {ExportToJson(), ""};
+        return {obj, ""};
     }
 
     bool ECH::ParseFromLink(const QString& link)
@@ -334,9 +334,9 @@ namespace Configs {
         if (fragment) object["fragment"] = fragment;
         if (!fragment_fallback_delay.isEmpty()) object["fragment_fallback_delay"] = fragment_fallback_delay;
         if (record_fragment) object["record_fragment"] = record_fragment;
-        if (ech->enabled) object["ech"] = ech->Build().object;
-        if (utls->enabled) object["utls"] = utls->Build().object;
-        if (reality->enabled) object["reality"] = reality->Build().object;
+        if (auto obj = ech->Build().object;!obj.isEmpty()) object["ech"] = obj;
+        if (auto obj = utls->Build().object;!obj.isEmpty()) object["utls"] = obj;
+        if (auto obj = reality->Build().object;!obj.isEmpty()) object["reality"] = obj;
         return {object, ""};
     }
 }

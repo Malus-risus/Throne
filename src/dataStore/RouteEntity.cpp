@@ -653,7 +653,7 @@ namespace Configs {
     {
         auto res = QStringList();
         for (const auto& item: Rules) {
-            if (item->outboundID == -2) {
+            if (item->outboundID == directID && item->action == "route") {
                 for (const auto& rset: item->rule_set) {
                     if (rset.startsWith("geoip-")) res << QString("ruleset:" + rset);
                 }
