@@ -215,11 +215,42 @@ private:
                json.contains("downloadSettings");
     }
 
+    static QJsonValue normalizeRangeField(const QJsonValue &val)
+    {
+        if (val.isDouble()) {
+            int num = val.toInt();
+            QString range = QString("%1-%1").arg(num);
+            return QJsonValue(range);
+        } else if (val.isString()) {
+            int num = val.toString().trimmed().toInt();
+            if (QString::number(num) == val.toString().trimmed()) {
+                QString range = QString("%1-%1").arg(num);
+                return QJsonValue(range);
+            }
+        }
+
+        return val;
+    }
+
     static void convertField(const QJsonObject &from, QJsonObject &to,
                              const QString &fromKey, const QString &toKey)
     {
         if (from.contains(fromKey)) {
-            to[toKey] = from[fromKey];
+            QJsonValue v = from[fromKey];
+
+            if (fromKey == "xPaddingBytes" ||
+                fromKey == "scMaxEachPostBytes" ||
+                fromKey == "scMinPostsIntervalMs" ||
+                fromKey == "scStreamUpServerSecs" ||
+                fromKey == "maxConcurrency" ||
+                fromKey == "maxConnections" ||
+                fromKey == "cMaxReuseTimes" ||
+                fromKey == "hMaxRequestTimes" ||
+                fromKey == "hMaxReusableSecs") {
+                v = normalizeRangeField(v);
+            }
+
+            to[toKey] = v;
         }
     }
 
