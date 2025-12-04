@@ -137,10 +137,7 @@ namespace Configs {
         QJsonObject object;
         if (type.isEmpty() || type == "tcp") return object;
         if (!type.isEmpty()) object["type"] = type;
-        if (!path.isEmpty()) {
-            if (type == "grpc") object["service_name"] = path;
-            else object["path"] = path;
-        }
+        if (!path.isEmpty()) object["path"] = path;
         if (!method.isEmpty()) object["method"] = method;
         if (!headers.isEmpty()) {
             object["headers"] = qStringListToJsonObject(headers);

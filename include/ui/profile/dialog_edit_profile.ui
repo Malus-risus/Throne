@@ -481,6 +481,16 @@
            </property>
           </widget>
          </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="service_name_l">
+           <property name="text">
+            <string>Service Name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="MyLineEdit" name="service_name"/>
+         </item>
          <item row="5" column="1">
           <widget class="MyLineEdit" name="ws_early_data_name"/>
          </item>

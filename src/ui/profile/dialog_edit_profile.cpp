@@ -44,8 +44,8 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
             ui->headers_l->setVisible(false);
             ui->method->setVisible(false);
             ui->method_l->setVisible(false);
-            ui->path->setVisible(true);
-            ui->path_l->setVisible(true);
+            ui->path->setVisible(false);
+            ui->path_l->setVisible(false);
             ui->host->setVisible(false);
             ui->host_l->setVisible(false);
         } else if (txt == "ws" || txt == "httpupgrade") {
@@ -84,6 +84,13 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
             ui->path_l->setVisible(false);
             ui->host->setVisible(false);
             ui->host_l->setVisible(false);
+        }
+        if (txt == "grpc") {
+            ui->service_name->setVisible(true);
+            ui->service_name_l->setVisible(true);
+        } else {
+            ui->service_name->setVisible(false);
+            ui->service_name_l->setVisible(false);
         }
         if (txt == "ws") {
             ui->ws_early_data_length->setVisible(true);
@@ -327,6 +334,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         ui->tls_rec_frag->setChecked(tls->record_fragment);
         ui->insecure->setChecked(tls->insecure);
         ui->headers->setText(transport->getHeadersString());
+        ui->service_name->setText(transport->service_name);
         ui->ws_early_data_name->setText(transport->early_data_header_name);
         ui->ws_early_data_length->setText(Int2String(transport->max_early_data));
         ui->xhttp_mode->setCurrentText(transport->xhttp_mode);
@@ -446,6 +454,7 @@ bool DialogEditProfile::onEnd() {
         tls->insecure = ui->insecure->isChecked();
         transport->headers = transport->getHeaderPairs(ui->headers->text());
         transport->method = ui->method->text();
+        transport->service_name = ui->service_name->text();
         transport->early_data_header_name = ui->ws_early_data_name->text();
         transport->max_early_data = ui->ws_early_data_length->text().toInt();
         transport->xhttp_mode = ui->xhttp_mode->currentText();
