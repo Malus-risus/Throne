@@ -7,32 +7,28 @@ import (
 	"Core/internal/process"
 	"Core/internal/sys"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/shlex"
 	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/common/settings"
 	"github.com/sagernet/sing-box/experimental/clashapi"
 	E "github.com/sagernet/sing/common/exceptions"
-	"github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/service"
+	"github.com/throneproj/clash2singbox/convert"
+	"github.com/throneproj/clash2singbox/model"
+	"github.com/throneproj/clash2singbox/model/clash"
+	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-	"encoding/json"
-	"github.com/xmdhs/clash2singbox/convert"
-	"github.com/xmdhs/clash2singbox/model"
-	"github.com/xmdhs/clash2singbox/model/clash"
-	"gopkg.in/yaml.v3"
 )
 
 var boxInstance *boxbox.Box
 var extraProcess *process.Process
 var needUnsetDNS bool
-var systemProxyController settings.SystemProxy
-var systemProxyAddr metadata.Socksaddr
 var instanceCancel context.CancelFunc
 var debug bool
 
