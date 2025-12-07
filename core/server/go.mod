@@ -21,7 +21,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-replace github.com/sagernet/sing-box => github.com/throneproj/sing-box v1.11.16-0.20251204174437-ba5c20fcf0b1
+replace github.com/sagernet/sing-box => github.com/throneproj/sing-box v1.11.16-0.20251207182128-ab22547e52ce
 
 replace github.com/sagernet/wireguard-go => github.com/throneproj/wireguard-go v0.0.1-beta.7.0.20250728063157-408bba78ad26
 
