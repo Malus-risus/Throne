@@ -383,7 +383,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->actionStart_with_system->setChecked(AutoRun_IsEnabled());
     ui->actionAllow_LAN->setChecked(QStringList{"::", "0.0.0.0"}.contains(Configs::dataStore->inbound_address));
 
-    connect(ui->actionHide_window, &QAction::triggered, this, [=, this](){ this->hide(); });
+    connect(ui->actionHide_window, &QAction::triggered, this, [=, this](){ HideWindow(this); });
     connect(ui->menu_open_config_folder, &QAction::triggered, this, [=,this] { QDesktopServices::openUrl(QUrl::fromLocalFile(QDir::currentPath())); });
     connect(ui->menu_add_from_clipboard2, &QAction::triggered, ui->menu_add_from_clipboard, &QAction::trigger);
     connect(ui->actionRestart_Proxy, &QAction::triggered, this, [=,this] { if (Configs::dataStore->started_id>=0) profile_start(Configs::dataStore->started_id); });
@@ -638,7 +638,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (tray->isVisible()) {
-        hide();
+        HideWindow(this);
         event->ignore();
     } else {
         on_menu_exit_triggered();
@@ -969,7 +969,7 @@ void MainWindow::prepare_exit()
         mu_exit.unlock();
         return;
     }
-    hide();
+    HideWindow(this);
     Configs::dataStore->prepare_exit = true;
     //
     RegisterHiddenMenuShortcuts(true);
