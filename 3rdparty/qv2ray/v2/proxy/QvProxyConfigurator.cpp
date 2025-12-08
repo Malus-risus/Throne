@@ -278,10 +278,19 @@ namespace Qv2ray::components::proxy {
         const auto configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
         QString kwriteconfigCmd = qEnvironmentVariable("KDE_SESSION_VERSION") == "5" ? "kwriteconfig5" : qEnvironmentVariable("KDE_SESSION_VERSION") == "6" ? "kwriteconfig6" : "kwriteconfig";
 
+        //
         // Configure HTTP Proxies for HTTP, FTP and HTTPS
         if (hasHTTP) {
             // iterate over protocols...
             for (const auto &protocol: QStringList{"http", "ftp", "https"}) {
+                // for GNOME:
+                {
+                    actions << ProcessArgument{"gsettings",
+                                               {"set", "org.gnome.system.proxy." + protocol, "host", address}};
+                    actions << ProcessArgument{"gsettings",
+                                               {"set", "org.gnome.system.proxy." + protocol, "port", QSTRN(httpPort)}};
+                }
+
                 // for KDE:
                 if (isKDE) {
                     actions << ProcessArgument{kwriteconfigCmd,
@@ -290,45 +299,41 @@ namespace Qv2ray::components::proxy {
                                                 "--key", protocol + "Proxy",          //
                                                 "http://" + address + " " + QSTRN(httpPort)}};
                 }
-                // for GNOME:
-                else {
-                    actions << ProcessArgument{"gsettings",
-                                               {"set", "org.gnome.system.proxy." + protocol, "host", address}};
-                    actions << ProcessArgument{"gsettings",
-                                               {"set", "org.gnome.system.proxy." + protocol, "port", QSTRN(httpPort)}};
-                }
             }
         }
 
         // Configure SOCKS5 Proxies
         if (hasSOCKS) {
+            // for GNOME:
+            {
+                actions << ProcessArgument{"gsettings", {"set", "org.gnome.system.proxy.socks", "host", address}};
+                actions << ProcessArgument{"gsettings",
+                                           {"set", "org.gnome.system.proxy.socks", "port", QSTRN(socksPort)}};
+
+                // for KDE:
+                if (isKDE) {
+                    actions << ProcessArgument{kwriteconfigCmd,
+                                               {"--file", configPath + "/kioslaverc", //
+                                                "--group", "Proxy Settings",          //
+                                                "--key", "socksProxy",                //
+                                                "socks://" + address + " " + QSTRN(socksPort)}};
+                }
+            }
+        }
+        // Setting Proxy Mode to Manual
+        {
+            // for GNOME:
+            {
+                actions << ProcessArgument{"gsettings", {"set", "org.gnome.system.proxy", "mode", "manual"}};
+            }
+
             // for KDE:
             if (isKDE) {
                 actions << ProcessArgument{kwriteconfigCmd,
                                            {"--file", configPath + "/kioslaverc", //
                                             "--group", "Proxy Settings",          //
-                                            "--key", "socksProxy",                //
-                                            "socks://" + address + " " + QSTRN(socksPort)}};
+                                            "--key", "ProxyType", "1"}};
             }
-            // for GNOME:
-            else {
-                actions << ProcessArgument{"gsettings", {"set", "org.gnome.system.proxy.socks", "host", address}};
-                actions << ProcessArgument{"gsettings",
-                                           {"set", "org.gnome.system.proxy.socks", "port", QSTRN(socksPort)}};
-            }
-        }
-
-        // Setting Proxy Mode to Manual
-        // for KDE:
-        if (isKDE) {
-            actions << ProcessArgument{kwriteconfigCmd,
-                                       {"--file", configPath + "/kioslaverc", //
-                                        "--group", "Proxy Settings",          //
-                                        "--key", "ProxyType", "1"}};
-        }
-        // for GNOME:
-        else {
-            actions << ProcessArgument{"gsettings", {"set", "org.gnome.system.proxy", "mode", "manual"}};
         }
 
         // Notify kioslaves to reload system proxy configuration.
@@ -390,16 +395,19 @@ namespace Qv2ray::components::proxy {
         const auto configRoot = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 
         // Setting System Proxy Mode to: None
-        // for KDE:
-        if (isKDE) {
-            actions << ProcessArgument{qEnvironmentVariable("KDE_SESSION_VERSION") == "5" ? "kwriteconfig5" : qEnvironmentVariable("KDE_SESSION_VERSION") == "6" ? "kwriteconfig6" : "kwriteconfig",
-                                       {"--file", configRoot + "/kioslaverc", //
-                                        "--group", "Proxy Settings",          //
-                                        "--key", "ProxyType", "0"}};
-        }
-        // for GNOME:
         {
-            actions << ProcessArgument{"gsettings", {"set", "org.gnome.system.proxy", "mode", "none"}};
+            // for GNOME:
+            {
+                actions << ProcessArgument{"gsettings", {"set", "org.gnome.system.proxy", "mode", "none"}};
+            }
+
+            // for KDE:
+            if (isKDE) {
+                actions << ProcessArgument{qEnvironmentVariable("KDE_SESSION_VERSION") == "5" ? "kwriteconfig5" : qEnvironmentVariable("KDE_SESSION_VERSION") == "6" ? "kwriteconfig6" : "kwriteconfig",
+                                           {"--file", configRoot + "/kioslaverc", //
+                                            "--group", "Proxy Settings",          //
+                                            "--key", "ProxyType", "0"}};
+            }
         }
 
         // Notify kioslaves to reload system proxy configuration.
