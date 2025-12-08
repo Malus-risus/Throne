@@ -1706,7 +1706,7 @@ void  MainWindow::on_menu_delete_repeat_triggered () {
     QList<std::shared_ptr<Configs::ProxyEntity>> out;
     QList<std::shared_ptr<Configs::ProxyEntity>> out_del;
 
-    Configs::ProfileFilter::Uniq (Configs::profileManager-> CurrentGroup ()-> GetProfileEnts (), out,  true ,  false );
+    Configs::ProfileFilter::Uniq (Configs::profileManager-> CurrentGroup ()-> GetProfileEnts (), out,  false );
     Configs::ProfileFilter::OnlyInSrc_ByPointer (Configs::profileManager-> CurrentGroup ()-> GetProfileEnts (), out, out_del);
 
     int  remove_display_count =  0 ;
