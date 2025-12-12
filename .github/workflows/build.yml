@@ -60,8 +60,8 @@ jobs:
           go-version: ${{ matrix.go_version }}
           cache-dependency-path: |
             core/server/go.sum
-      - name: Install Golang For Legacy Windows
-        if: matrix.cross_os == 'windowslegacy'
+      - name: Install Golang For Legacy OS
+        if: matrix.cross_os == 'windowslegacy' || matrix.cross_os == 'darwin-legacy'
         run: |
           curl -L -o go.7z https://github.com/throneproj/env_windows_legacy/releases/download/latest/go.7z
           7z x go.7z
