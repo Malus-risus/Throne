@@ -236,7 +236,7 @@ namespace Configs {
     {
         QUrlQuery query;
         if (!enabled) return "";
-        query.addQueryItem("security", "tls");
+        query.addQueryItem("security", reality->enabled ? "reality" : "tls");
         if (disable_sni) query.addQueryItem("disable_sni", "true");
         if (!server_name.isEmpty()) query.addQueryItem("sni", server_name);
         if (insecure) query.addQueryItem("allowInsecure", "true");
