@@ -9,7 +9,7 @@ namespace Configs {
     bool uTLS::ParseFromLink(const QString& link)
     {
         auto url = QUrl(link);
-        if (!url.isValid()) return false;
+        if (!url.isValid() && !url.errorString().startsWith("Invalid port")) return false;
         auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
 
         // handle the common format
@@ -53,7 +53,7 @@ namespace Configs {
     bool ECH::ParseFromLink(const QString& link)
     {
         auto url = QUrl(link);
-        if (!url.isValid()) return false;
+        if (!url.isValid() && !url.errorString().startsWith("Invalid port")) return false;
         auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
 
         if (query.hasQueryItem("ech_enabled")) enabled = query.queryItemValue("ech_enabled") == "true";
@@ -99,7 +99,7 @@ namespace Configs {
     bool Reality::ParseFromLink(const QString& link)
     {
         auto url = QUrl(link);
-        if (!url.isValid()) return false;
+        if (!url.isValid() && !url.errorString().startsWith("Invalid port")) return false;
         auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
 
         // handle the common format
@@ -150,7 +150,7 @@ namespace Configs {
     bool TLS::ParseFromLink(const QString& link)
     {
         auto url = QUrl(link);
-        if (!url.isValid()) return false;
+        if (!url.isValid() && !url.errorString().startsWith("Invalid port")) return false;
         auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
 
         if (query.hasQueryItem("security")) enabled = query.queryItemValue("security")
