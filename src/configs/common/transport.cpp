@@ -63,7 +63,7 @@ namespace Configs {
     {
         auto url = QUrl(link);
         if (!url.isValid()) return false;
-        auto query = QUrlQuery(url.query(QUrl::ComponentFormattingOption::FullyDecoded));
+        auto query = QUrlQuery(url.query());
 
         if (query.hasQueryItem("type"))
         {
@@ -74,17 +74,17 @@ namespace Configs {
             }
         }
         if (query.hasQueryItem("host")) host = query.queryItemValue("host");
-        if (query.hasQueryItem("path")) path = query.queryItemValue("path");
+        if (query.hasQueryItem("path")) path = query.queryItemValue("path", QUrl::FullyDecoded);
         if (query.hasQueryItem("method")) method = query.queryItemValue("method");
-        if (query.hasQueryItem("headers")) headers = query.queryItemValue("headers").split(",");
+        if (query.hasQueryItem("headers")) headers = query.queryItemValue("headers", QUrl::FullyDecoded).split(",");
         if (query.hasQueryItem("idle_timeout")) idle_timeout = query.queryItemValue("idle_timeout");
         if (query.hasQueryItem("ping_timeout")) ping_timeout = query.queryItemValue("ping_timeout");
         if (query.hasQueryItem("max_early_data")) max_early_data = query.queryItemValue("max_early_data").toInt();
         if (query.hasQueryItem("early_data_header_name")) early_data_header_name = query.queryItemValue("early_data_header_name");
-        if (query.hasQueryItem("serviceName")) service_name = query.queryItemValue("serviceName");
+        if (query.hasQueryItem("serviceName")) service_name = query.queryItemValue("serviceName", QUrl::FullyDecoded);
         if (type == "xhttp") {
             if (query.hasQueryItem("mode")) xhttp_mode = query.queryItemValue("mode");
-            if (query.hasQueryItem("extra")) xhttp_extra = query.queryItemValue("extra");
+            if (query.hasQueryItem("extra")) xhttp_extra = query.queryItemValue("extra", QUrl::FullyDecoded);
         }
         return true;
     }
@@ -175,5 +175,3 @@ namespace Configs {
         return {ExportToJson(), ""};
     }
 }
-
-
