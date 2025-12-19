@@ -157,13 +157,13 @@ namespace Configs {
                 modified.replace(":", "-");
                 portList.append(modified);
             }
-            result = url.toString();
-            QString authority = url.authority();
+            result = url.toString(QUrl::FullyEncoded);
+            QString authority = url.authority(QUrl::FullyEncoded);
             int portStartIndex = result.indexOf(authority) + authority.length();
             result.insert(portStartIndex, ":" + portList.join(","));
         } else {
             url.setPort(server_port);
-            result = url.toString();
+            result = url.toString(QUrl::FullyEncoded);
         }
         
         return result;
