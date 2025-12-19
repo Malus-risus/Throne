@@ -111,7 +111,7 @@ namespace Subscription {
             if (dataBytes.isEmpty()) return;
             auto data = QJsonDocument::fromJson(dataBytes).object();
             if (data.isEmpty()) return;
-            ent = Configs::ProfileManager::NewProxyEntity(data["type"].toString());
+            ent = data["type"].toString() == "hysteria2" ? Configs::ProfileManager::NewProxyEntity("hysteria") : Configs::ProfileManager::NewProxyEntity(data["type"].toString());
             if (ent->outbound->invalid) return;
             ent->outbound->ParseFromJson(data);
         }
