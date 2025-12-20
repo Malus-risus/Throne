@@ -611,7 +611,7 @@ namespace Configs {
             ctx->error = "No group found for ent, data is corrupted";
             return;
         }
-        if (group->landing_proxy_id >= 0) entIDs.append(group->landing_proxy_id);
+        if (group->landing_proxy_id >= 0) entIDs.prepend(group->landing_proxy_id);
         if (ctx->ent->type == "chain")
         {
             auto chain = ctx->ent->Chain();
@@ -959,7 +959,15 @@ namespace Configs {
                     continue;
                 }
             }
-            buildOutboundChain(ctx, unwrapChain(item->id), "proxy-" + Int2String(suffix), false, true);
+            auto IDs = unwrapChain(item->id);
+            auto group = profileManager->GetGroup(item->gid);
+            if (group == nullptr) {
+                res->error = "Null group on profile, data is corrupted";
+                return res;
+            }
+            if (group->landing_proxy_id >= 0) IDs.prepend(group->landing_proxy_id);
+            if (group->front_proxy_id >= 0) IDs.append(group->front_proxy_id);
+            buildOutboundChain(ctx, IDs, "proxy-" + Int2String(suffix), false, true);
             if (!ctx->error.isEmpty()) {
                 res->error = ctx->error;
                 return res;
