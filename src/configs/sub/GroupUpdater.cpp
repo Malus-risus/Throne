@@ -55,6 +55,27 @@ namespace Subscription {
             return;
         }
 
+        // Json
+        QJsonParseError error;
+        QJsonDocument::fromJson(str.toUtf8(), &error);
+        if (error.error == error.NoError) {
+            // SingBox
+            if (str.contains("outbounds") || str.contains("endpoints"))
+            {
+                updateSingBox(str);
+                return;
+            }
+
+            // SIP008
+            if (str.contains("version") && str.contains("servers"))
+            {
+                updateSIP008(str);
+                return;
+            }
+
+            return;
+        }
+
         // Clash
         if (str.contains("proxies:")) {
             bool ok;
@@ -66,24 +87,10 @@ namespace Subscription {
             return;
         }
 
-        // SingBox
-        if (str.contains("outbounds") || str.contains("endpoints"))
-        {
-            updateSingBox(str);
-            return;
-        }
-
         // Wireguard Config
         if (str.contains("[Interface]") && str.contains("[Peer]"))
         {
             updateWireguardFileConfig(str);
-            return;
-        }
-
-        // SIP008
-        if (str.contains("version") && str.contains("servers"))
-        {
-            updateSIP008(str);
             return;
         }
 
