@@ -253,6 +253,7 @@ namespace Subscription {
 
             // HTTP
             if (out["type"] == "http") {
+                ent = Configs::ProfileManager::NewProxyEntity("http");
                 auto ok = ent->Http()->ParseFromJson(out);
                 if (!ok) continue;
             }
