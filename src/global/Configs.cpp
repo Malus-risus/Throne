@@ -402,9 +402,17 @@ namespace Configs {
 
     QString FindCoreRealPath() {
         auto fn = QApplication::applicationDirPath() + "/Core";
+#ifdef Q_OS_WIN
+        fn += ".exe";
+#endif
         auto fi = QFileInfo(fn);
-        if (fi.isSymLink()) return fi.symLinkTarget();
-        return fn;
+        QString path;
+        if (fi.isSymLink()) path =  fi.symLinkTarget();
+        path = fn;
+#ifdef Q_OS_WIN
+        path.replace("/", "\\");
+#endif
+        return path;
     }
 
     short isAdminCache = -1;
