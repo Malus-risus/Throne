@@ -218,8 +218,8 @@ github.com/tevino/abool/v2 v2.1.0 h1:7w+Vf9f/5gmKT4m4qkayb33/92M+Um45F2BkHOR+L/c
 github.com/tevino/abool/v2 v2.1.0/go.mod h1:+Lmlqk6bHDWHqN1cbxqhwEAwMPXgc8I1SDEamtseuXY=
 github.com/throneproj/clash2singbox v0.1.5-0.20251204215643-2a0d5666be7e h1:/gc+y8oQeTVgbi5q3CRIx0A21fFnL7cCZB05su+AhL0=
 github.com/throneproj/clash2singbox v0.1.5-0.20251204215643-2a0d5666be7e/go.mod h1:3m4//Gs1k6NveUCrrRU6BSzOk4jy+nx3vKbSQJoZssQ=
-github.com/throneproj/sing-box v1.11.16-0.20251230004553-1f0be4ffeb99 h1:w8kKMVguoKq1tD7Fc7R4DRihEiWO0pPAmLRi2s4x7jY=
-github.com/throneproj/sing-box v1.11.16-0.20251230004553-1f0be4ffeb99/go.mod h1:d9IB8k/k0or1jihap21ZEt6d40vj+Z3B6il3SlXzW48=
+github.com/throneproj/sing-box v1.11.16-0.20251230014526-997ca3c3a5d0 h1://SaG/PSTMfU0k+hCL+WMWfEXWPdmstOA86Fi7VSmJY=
+github.com/throneproj/sing-box v1.11.16-0.20251230014526-997ca3c3a5d0/go.mod h1:d9IB8k/k0or1jihap21ZEt6d40vj+Z3B6il3SlXzW48=
 github.com/throneproj/wireguard-go v0.0.1-beta.7.0.20250728063157-408bba78ad26 h1:bBzqh7xTshvPjTFz4URNj/xbPA/d0BOwUM2R83FEMGU=
 github.com/throneproj/wireguard-go v0.0.1-beta.7.0.20250728063157-408bba78ad26/go.mod h1:akc2Wh+rX9bFFNnHJGsQ8VIV3eJI1LXJYgx2Y+8lcW8=
 github.com/u-root/uio v0.0.0-20240224005618-d2acac8f3701 h1:pyC9PaHYZFgEKFdlp3G8RaCKgVpHZnecvArXvPXcFkM=
