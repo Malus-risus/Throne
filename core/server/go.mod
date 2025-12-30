@@ -12,7 +12,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/sagernet/sing v0.7.14
-	github.com/sagernet/sing-box v1.12.12
+	github.com/sagernet/sing-box v1.12.14
 	github.com/sagernet/sing-tun v0.7.3
 	github.com/spf13/cobra v1.10.1
 	github.com/throneproj/clash2singbox v0.1.5-0.20251204215643-2a0d5666be7e
