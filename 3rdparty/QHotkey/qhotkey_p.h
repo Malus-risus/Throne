@@ -46,6 +46,10 @@ private:
 	Q_INVOKABLE QHotkey::NativeShortcut nativeShortcutInvoked(Qt::Key keycode, Qt::KeyboardModifiers modifiers);
 };
 
+// Single-backend platforms (Windows, macOS) use this macro to define the
+// QHotkeyPrivate singleton accessor. On Unix the backend is chosen at runtime
+// (X11 vs. the XDG desktop portal), so qhotkey_linux.cpp defines instance() and
+// isPlatformSupported() itself and does NOT use this macro.
 #define NATIVE_INSTANCE(ClassName) \
 	Q_GLOBAL_STATIC(ClassName, hotkeyPrivate) \
 	\
@@ -53,3 +57,14 @@ private:
 	{\
 		return hotkeyPrivate;\
 	}
+
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
+// Backend factories and availability probes used by the runtime dispatcher in
+// qhotkey_linux.cpp. Each is implemented in its respective backend translation
+// unit (qhotkey_x11.cpp / qhotkey_portal.cpp) and both are compiled into the
+// library, since a single Linux binary may run under X11, Wayland or XWayland.
+QHotkeyPrivate *createX11HotkeyPrivate();
+bool x11HotkeyPlatformSupported();
+QHotkeyPrivate *createPortalHotkeyPrivate();
+bool portalHotkeyPlatformSupported();
+#endif

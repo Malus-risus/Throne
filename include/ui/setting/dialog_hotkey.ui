@@ -15,6 +15,22 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QLabel" name="unsupported_note">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #d9822b; font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>Global hotkeys are not supported on this system. On Wayland, they require a compositor that provides the XDG global shortcuts portal (for example KDE Plasma, GNOME 47+, or Hyprland).</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="styleSheet">
       <string notr="true">QTabWidget::pane {

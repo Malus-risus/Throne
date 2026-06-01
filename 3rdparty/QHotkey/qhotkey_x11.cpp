@@ -43,11 +43,17 @@ private:
 		static int handleError(Display *display, XErrorEvent *error);
 	};
 };
-NATIVE_INSTANCE(QHotkeyPrivateX11)
 
-bool QHotkeyPrivate::isPlatformSupported()
+// Backend factory + availability probe for the runtime dispatcher in
+// qhotkey_linux.cpp. (instance() / isPlatformSupported() are defined there.)
+QHotkeyPrivate *createX11HotkeyPrivate()
 {
-	return qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+	return new QHotkeyPrivateX11();
+}
+
+bool x11HotkeyPlatformSupported()
+{
+	return qGuiApp->nativeInterface<QNativeInterface::QX11Application>() != nullptr;
 }
 
 const QVector<quint32> QHotkeyPrivateX11::specialModifiers = {0, Mod2Mask, LockMask, (Mod2Mask | LockMask)};

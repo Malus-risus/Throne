@@ -4,9 +4,13 @@
 
 #include "include/ui/mainwindow_interface.h"
 #include <QAction>
+#include <3rdparty/QHotkey/qhotkey.h>
 
 DialogHotkey::DialogHotkey(QWidget *parent, const QList<QAction*>& actions) : QDialog(parent), ui(new Ui::DialogHotkey) {
     ui->setupUi(this);
+    // Global hotkey availability is determined at runtime (e.g. Wayland without
+    // the XDG global-shortcuts portal is unsupported); warn the user if so.
+    ui->unsupported_note->setVisible(!QHotkey::isPlatformSupported());
     ui->show_mainwindow->setKeySequence(Configs::dataManager->settingsRepo->hotkey_mainwindow);
     ui->show_groups->setKeySequence(Configs::dataManager->settingsRepo->hotkey_group);
     ui->show_routes->setKeySequence(Configs::dataManager->settingsRepo->hotkey_route);
