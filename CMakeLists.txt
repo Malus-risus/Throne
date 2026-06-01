@@ -385,7 +385,6 @@ set_target_properties(Throne PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER moe.Throne.macosx
         MACOSX_BUNDLE TRUE
         WIN32_EXECUTABLE TRUE
-        UNITY_BUILD ON
 )
 set_property(SOURCE "3rdparty/SQLiteCpp/src/sqlite3.c" PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)
 
