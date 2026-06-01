@@ -24,6 +24,7 @@
 #endif
 #ifdef Q_OS_LINUX
 #include <include/sys/linux/coreDump.h>
+#include <include/sys/linux/DesktopEntry.h>
 #include <qfontdatabase.h>
 #endif
 #ifdef Q_OS_MACOS
@@ -94,6 +95,18 @@ int main(int argc, char* argv[]) {
     QApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
     QApplication::setQuitOnLastWindowClosed(false);
     QApplication a(argc, argv);
+
+    // Stable application id, matching the installed Throne.desktop. This sets the
+    // Wayland app_id / X11 WM_CLASS, which is the identity the XDG desktop portal
+    // keys on. Global shortcuts (and other portals) persist per app id, so without
+    // a stable one the GlobalShortcuts portal would re-prompt on every startup.
+    QGuiApplication::setDesktopFileName(QStringLiteral("Throne"));
+#ifdef Q_OS_LINUX
+    // Portable/zip installs ship no system desktop entry; ensure a per-user
+    // ~/.local/share/applications/Throne.desktop exists so the portal can resolve
+    // the app id above to a desktop entry (no-op if the .deb already installed one).
+    DesktopEntry_Ensure();
+#endif
 
 #ifdef Q_OS_MACOS
     // Install before the event loop so launch-by-deeplink FileOpen events are caught.
