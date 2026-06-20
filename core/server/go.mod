@@ -11,7 +11,7 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/sagernet/sing v0.7.12
 	github.com/sagernet/sing-box v1.12.9
-	github.com/sagernet/sing-tun v0.7.2
+	github.com/sagernet/sing-tun v0.8.11
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/sys v0.35.0
 	google.golang.org/protobuf v1.36.6
