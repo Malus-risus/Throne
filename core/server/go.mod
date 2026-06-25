@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang/protobuf v1.5.4
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/sagernet/sing v0.7.12
+	github.com/sagernet/sing v0.8.11
 	github.com/sagernet/sing-box v1.12.9
 	github.com/sagernet/sing-tun v0.7.2
 	github.com/spf13/cobra v1.9.1
