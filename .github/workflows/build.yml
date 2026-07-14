@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Cache Common Download
         id: cache-common
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v4.3.0
         with:
           path: artifacts.tgz
           key: CommonCache-${{ matrix.cross_os }}-${{ matrix.cross_arch }}-${{ hashFiles('script/build_go.sh', 'core/*') }}-${{ matrix.go_version }}
