@@ -195,7 +195,7 @@ replace github.com/sagernet/cronet-go/lib/android_386 => github.com/parhelia512/
 
 replace github.com/sagernet/cronet-go/lib/android_amd64 => github.com/parhelia512/cronet-go/lib/android_amd64 v0.0.0-20260515230114-6df543aa5cbc
 
-replace github.com/sagernet/cronet-go/lib/android_arm => github.com/parhelia512/cronet-go/lib/android_arm v0.0.0-20260515230114-6df543aa5cbc
+replace github.com/sagernet/cronet-go/lib/android_arm => github.com/parhelia512/cronet-go/lib/android_arm v0.0.1-143.0.7499.109-1
 
 replace github.com/sagernet/cronet-go/lib/android_arm64 => github.com/parhelia512/cronet-go/lib/android_arm64 v0.0.0-20260515230114-6df543aa5cbc
 
