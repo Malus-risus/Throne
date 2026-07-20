@@ -201,7 +201,7 @@ replace github.com/sagernet/cronet-go/lib/android_arm64 => github.com/parhelia51
 
 replace github.com/sagernet/cronet-go/lib/darwin_amd64 => github.com/parhelia512/cronet-go/lib/darwin_amd64 v0.0.0-20260515230114-6df543aa5cbc
 
-replace github.com/sagernet/cronet-go/lib/darwin_arm64 => github.com/parhelia512/cronet-go/lib/darwin_arm64 v0.0.0-20260515230114-6df543aa5cbc
+replace github.com/sagernet/cronet-go/lib/darwin_arm64 => github.com/parhelia512/cronet-go/lib/darwin_arm64 v0.0.1-143.0.7499.109-1
 
 replace github.com/sagernet/cronet-go/lib/ios_amd64_simulator => github.com/parhelia512/cronet-go/lib/ios_amd64_simulator v0.0.0-20260515230114-6df543aa5cbc
 
