@@ -187,7 +187,7 @@ require (
 	lukechampine.com/blake3 v1.4.1 // indirect
 )
 
-replace github.com/sagernet/cronet-go => github.com/parhelia512/cronet-go v0.0.0-20260515230114-6df543aa5cbc
+replace github.com/sagernet/cronet-go => github.com/parhelia512/cronet-go v0.0.1-143.0.7499.109-1
 
 replace github.com/sagernet/cronet-go/all => github.com/parhelia512/cronet-go/all v0.0.0-20260515230114-6df543aa5cbc
 
