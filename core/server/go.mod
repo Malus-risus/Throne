@@ -12,7 +12,7 @@ require (
 	github.com/sagernet/sing-tun v0.8.11
 	github.com/spf13/cobra v1.10.2
 	github.com/tailscale/go-winio v0.0.0-20231025203758-c4f33415bf55
-	github.com/xtls/xray-core v1.260327.1-0.20260627131803-45cf2898ab12
+	github.com/xtls/xray-core c1958dba04ba
 	golang.org/x/crypto v0.54.0
 	golang.org/x/sys v0.47.0
 	google.golang.org/grpc v1.82.0
