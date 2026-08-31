@@ -19,7 +19,7 @@ require (
 	google.golang.org/protobuf v1.36.11
 )
 
-replace github.com/xtls/xray-core => github.com/throneproj/xray-core v1.251015.1-0.20260716143004-4c11ca217e27
+replace github.com/xtls/xray-core => github.com/throneproj/xray-core c659cc0ab233
 
 replace github.com/sagernet/sing-box => github.com/Throneproj/sing-box v1.11.16-0.20260625190707-0ff77d521b09
 
